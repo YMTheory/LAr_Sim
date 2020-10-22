@@ -1,5 +1,5 @@
 #include "LArParticleSource.hh"
-//#include "LArAnalysisManager.hh"
+#include "LArAnalysisManager.hh"
 
 #include "G4Event.hh"
 #include "G4PhysicalConstants.hh"
@@ -26,11 +26,11 @@ LArParticleSource::LArParticleSource ()  {
     MonoEnergy                     = 1*MeV;
 
     FV_radius                      = 85*cm;
-    //theMessenger                   = new LArParticleSourceMessenger(this);
+    theMessenger                   = new LArParticleSourceMessenger(this);
 }
 
 LArParticleSource::~LArParticleSource () {
-    //delete theMessenger;
+    delete theMessenger;
 }
 
 
@@ -69,7 +69,7 @@ void LArParticleSource::GenerateUniformSource()
 {
     if (SourcePosType == "Uniform" ) {
         G4double phi = G4UniformRand()*2*pi;
-        G4double costheta = -1 * 2*G4UniformRand();
+        G4double costheta = -1 + 2*G4UniformRand();
         G4double u = G4UniformRand();
 
         G4double posr = FV_radius * std::cbrt(u);
@@ -162,8 +162,8 @@ void LArParticleSource::GeneratePrimaryVertex(G4Event* event)  {
     }
 
 
-    //LArAnalysisManager* analysis = LArAnalysisManager::getInstance();
-    //analysis->analyseInitPhotonNumber(NumberOfParticlesToBeGenerated);
+    LArAnalysisManager* analysis = LArAnalysisManager::getInstance();
+    analysis->analyseInitPhotonNumber(NumberOfParticlesToBeGenerated);
 
     for( G4int i=0; i<NumberOfParticlesToBeGenerated; i++ ) {
         // Position

@@ -6,7 +6,7 @@
 #include "G4ParticleMomentum.hh"
 #include "G4ParticleDefinition.hh"
 
-//#include "LArParticleSourceMessenger.hh"
+#include "LArParticleSourceMessenger.hh"
 
 class LArParticleSource : public G4VPrimaryGenerator {
 
@@ -69,7 +69,7 @@ class LArParticleSource : public G4VPrimaryGenerator {
         G4int verbosityLevel;
 
     private:
-        //LArParticleSourceMessenger* theMessenger;
+        LArParticleSourceMessenger* theMessenger;
 };
 
 #endif
