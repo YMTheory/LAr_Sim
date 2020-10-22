@@ -22,7 +22,6 @@ class LArDetectorConstructionMessenger : public G4UImessenger
 
 
         virtual void SetNewValue( G4UIcommand *cmd, G4String newValues );
-        virtual G4String GetCurrentValue( G4UIcommand* cmd );
 
     private:
         LArDetectorConstruction*         fTarget;

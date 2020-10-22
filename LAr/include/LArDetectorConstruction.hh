@@ -15,7 +15,7 @@ class LArDetectorConstruction : public G4VUserDetectorConstruction
         virtual ~LArDetectorConstruction();
 
         virtual G4VPhysicalVolume* Construct();
-        //virtual void ConstructSDandField();
+        virtual void ConstructSDandField();
 
         void DefineMaterials();
         G4VPhysicalVolume* DefineVolumes();

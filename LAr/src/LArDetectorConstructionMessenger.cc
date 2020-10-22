@@ -42,7 +42,3 @@ void LArDetectorConstructionMessenger::SetNewValue(
 }
 
 
-G4String LArDetectorConstructionMessenger::GetCurrentValue(G4UIcommand* cmd)
-{
-    ;
-}

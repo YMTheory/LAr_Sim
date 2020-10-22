@@ -1,5 +1,6 @@
 #include "LArDetectorConstruction.hh"
 #include "LArDetectorConstructionMessenger.hh"
+#include "LArCollectorSD.hh"
 
 #include "G4NistManager.hh"
 #include "G4MaterialPropertiesTable.hh"
@@ -11,6 +12,7 @@
 #include "G4PVPlacement.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
+#include "G4SDManager.hh"
 
 LArDetectorConstruction::LArDetectorConstruction()
     : G4VUserDetectorConstruction(),
@@ -107,5 +109,51 @@ G4VPhysicalVolume* LArDetectorConstruction::DefineVolumes()
             fCheckOverlaps
         );
 
+    G4VisAttributes* cdVisAtt = new G4VisAttributes(G4Colour(0, 1, 1));
+    cdLV->SetVisAttributes(cdVisAtt);
+
+    /// photon collector
+    G4double inner = radius+0.1*mm;
+    G4double outer = radius+1*mm;
+    G4Sphere* colSD = 
+    new G4Sphere(
+            "colSD",
+            inner, outer,
+            0, twopi,
+            0, pi
+        );
+
+    
+    G4LogicalVolume* colLV = 
+    new G4LogicalVolume(
+            colSD,
+            fLAr,
+            "colLV"
+        );
+
+    new G4PVPlacement(
+            0,
+            G4ThreeVector(),
+            colLV,
+            "worldLV",
+            worldLV,
+            false,
+            0,
+            fCheckOverlaps
+        );
+    G4VisAttributes* colVisAtt = new G4VisAttributes(G4Colour(1, 1, 0));
+    colLV->SetVisAttributes(colVisAtt);
+
     return worldPV;
+}
+
+void LArDetectorConstruction::ConstructSDandField()
+{
+    G4cout << " ----> Add Sensitive Detector "  << G4endl;
+
+    auto collectorSD =
+        new LArCollectorSD("colSD", "CollectorHitsCollection", 1);
+    G4SDManager::GetSDMpointer()->AddNewDetector(collectorSD);
+    //SetSensitiveDetector("colLV", collectorSD);
+    SetSensitiveDetector("cdLV", collectorSD);
 }
