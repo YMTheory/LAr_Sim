@@ -1,4 +1,5 @@
 #include "LArDetectorConstruction.hh"
+#include "LArDetectorConstructionMessenger.hh"
 
 #include "G4NistManager.hh"
 #include "G4MaterialPropertiesTable.hh"
@@ -17,7 +18,9 @@ LArDetectorConstruction::LArDetectorConstruction()
     fAir(NULL),
     fLAr(NULL)
 {
-    
+    radius = 85*cm;    
+
+    fMessenger  = new LArDetectorConstructionMessenger(this);
 }
 
 
@@ -52,7 +55,8 @@ void LArDetectorConstruction::DefineMaterials()
 
 G4VPhysicalVolume* LArDetectorConstruction::DefineVolumes()
 {
-    G4double radius = 85*cm;
+    G4cout << "Initializa CD : radius = " << radius << G4endl;
+
     G4double worldLength = 3 * radius;
 
     ///// World Construction /////

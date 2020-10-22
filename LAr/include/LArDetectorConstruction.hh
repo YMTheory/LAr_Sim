@@ -2,6 +2,7 @@
 #define LArDetectorConstruction_h
 
 #include "G4VUserDetectorConstruction.hh"
+#include "LArDetectorConstructionMessenger.hh"
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
@@ -18,12 +19,20 @@ class LArDetectorConstruction : public G4VUserDetectorConstruction
 
         void DefineMaterials();
         G4VPhysicalVolume* DefineVolumes();
+    
+    public:
+        void setRadius(G4double fR) { radius = fR; }
+
+    private:
+        LArDetectorConstructionMessenger* fMessenger;
 
     private:
         G4bool fCheckOverlaps;
 
         G4Material* fAir;
         G4Material* fLAr;
+
+        G4double radius;
 };
 
 #endif
