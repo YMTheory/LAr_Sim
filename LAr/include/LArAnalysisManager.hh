@@ -2,7 +2,7 @@
 #define LArAnalysisManager_h 1
 
 #include "globals.hh"
-//#include "LArAnalysisMessenger.hh"
+#include "LArAnalysisMessenger.hh"
 
 class LArAnalysisMessenger;
 
@@ -35,7 +35,7 @@ class LArAnalysisManager  {
 
         static LArAnalysisManager* instance;
         
-        //LArAnalysisMessenger* analysisMessenger;
+        LArAnalysisMessenger* analysisMessenger;
 
 };
 

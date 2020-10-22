@@ -1,5 +1,7 @@
 #include "LArActionInitialization.hh"
 #include "LArPrimaryGeneratorAction.hh"
+#include "LArRunAction.hh"
+#include "LArEventAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -17,7 +19,14 @@ LArActionInitialization::~LArActionInitialization()
 
 void LArActionInitialization::Build() const
 {
-  SetUserAction(new LArPrimaryGeneratorAction);
+    SetUserAction(new LArPrimaryGeneratorAction);
+
+
+    LArEventAction* eventAction = new LArEventAction();
+    SetUserAction(eventAction);
+
+    LArRunAction* runAction = new LArRunAction();
+    SetUserAction(runAction);
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

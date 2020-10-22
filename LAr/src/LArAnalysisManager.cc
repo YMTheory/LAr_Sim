@@ -16,7 +16,7 @@ LArAnalysisManager::LArAnalysisManager()
     G4AnalysisManager::Instance();
 
     // creating the messenger
-    //analysisMessenger = new LArAnalysisMessenger(this);
+    analysisMessenger = new LArAnalysisMessenger(this);
 
     G4cout << " +++++ LArAnalysisManager created" << G4endl;
 }
