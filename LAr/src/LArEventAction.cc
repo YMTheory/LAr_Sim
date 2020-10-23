@@ -49,6 +49,7 @@ LArEventAction::GetHitsCollection(G4int hcID,
 void LArEventAction::BeginOfEventAction(const G4Event* )
 {
     //G4cout << "Begin of Event " << evt->GetEventID() << G4endl;
+    LArAnalysisManager* analysis = LArAnalysisManager::getInstance();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -71,7 +72,7 @@ void LArEventAction::EndOfEventAction(const G4Event* event)
 
     if ( CollectorHC->entries()>0 ) {
         // Get hit with total values
-        auto CollectorHit = (*CollectorHC)[CollectorHC->entries()-1];
+        //auto CollectorHit = (*CollectorHC)[CollectorHC->entries()-1];
 
         // Print per event
     //    auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();

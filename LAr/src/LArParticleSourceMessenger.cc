@@ -76,6 +76,12 @@ LArParticleSourceMessenger::LArParticleSourceMessenger
     typeCmd->SetDefaultValue("Point");
     typeCmd->SetCandidates("Point Uniform");
 
+    // FV radius
+    fvRadiusCmd = new G4UIcmdWithADoubleAndUnit("/LAr/gun/fv", this);
+    fvRadiusCmd->SetGuidance("Set FV Radius");
+    fvRadiusCmd->SetDefaultValue(55);
+    fvRadiusCmd->SetDefaultUnit("cm");
+    fvRadiusCmd->SetUnitCandidates("mm cm m");
 
     // centre coordinates
     centreCmd = new G4UIcmdWith3VectorAndUnit("/LAr/gun/center", this);
@@ -114,6 +120,7 @@ LArParticleSourceMessenger::~LArParticleSourceMessenger()
     delete positionCmd;
     delete energyCmd;
     delete numberCmd;
+    delete fvRadiusCmd;
 
     delete gunDirectory;
 }
@@ -148,6 +155,10 @@ void LArParticleSourceMessenger::SetNewValue
     else if ( cmd == positionCmd ) {
         fParticleGun->SetPosDisType("Point");
         fParticleGun->SetCentreCoords(positionCmd->GetNew3VectorValue(newValues));
+    }
+
+    else if ( cmd == fvRadiusCmd ) {
+        fParticleGun->SetFVRadius( fvRadiusCmd->GetNewDoubleValue(newValues) );
     }
 
     else if ( cmd == numberCmd ) {

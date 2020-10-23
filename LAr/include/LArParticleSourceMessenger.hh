@@ -41,6 +41,7 @@ class LArParticleSourceMessenger: public G4UImessenger {
         G4UIcmdWith3VectorAndUnit    *positionCmd;
         G4UIcmdWithADoubleAndUnit    *energyCmd;
         G4UIcmdWithAString           *energytypeCmd;
+        G4UIcmdWithADoubleAndUnit    *fvRadiusCmd;
         G4UIcmdWithAnInteger         *verbosityCmd;
         G4UIcmdWithoutParameter      *listCmd;
 

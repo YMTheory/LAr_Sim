@@ -13,22 +13,21 @@
 
 class LArEventAction : public G4UserEventAction
 {
-  public:
-    LArEventAction();
-    virtual ~LArEventAction();
+    public:
+        LArEventAction();
+        virtual ~LArEventAction();
 
-    virtual void BeginOfEventAction(const G4Event* event);
-    virtual void EndOfEventAction(const G4Event* event);
+        virtual void BeginOfEventAction(const G4Event* event);
+        virtual void EndOfEventAction(const G4Event* event);
 
 
-  private:
-    // methods
-    LArCollectorHitsCollection* GetHitsCollection(G4int hcID,
+    private:
+        // methods
+        LArCollectorHitsCollection* GetHitsCollection(G4int hcID,
                                            const G4Event* event) const;
-    //void PrintEventStatistics(G4int pmtTrackID) const;
 
-    // data members
-    G4int fCollectorID;
+        // data members
+        G4int fCollectorID;
 
 };
 

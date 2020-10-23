@@ -1,0 +1,22 @@
+# detector config
+/LAr/det/setRadius 85 mm
+
+/run/initialize
+
+# verbose config
+/control/verbose 0
+/run/verbose 0
+/tracking/verbose 0
+
+# particle gun config
+#/LAr/gun/verbose 0
+/LAr/gun/number 1000
+/LAr/gun/particle opticalphoton
+/LAr/gun/energytype Mono
+/LAr/gun/energy 2.884 eV
+/LAr/gun/type Uniform
+/LAr/gun/fv 55 cm
+
+/LAr/analy/outputFile test
+
+/run/beamOn 10000

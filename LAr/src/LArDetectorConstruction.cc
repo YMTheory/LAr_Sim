@@ -113,7 +113,7 @@ G4VPhysicalVolume* LArDetectorConstruction::DefineVolumes()
     cdLV->SetVisAttributes(cdVisAtt);
 
     /// photon collector
-    G4double inner = radius+0.1*mm;
+    G4double inner = radius;
     G4double outer = radius+1*mm;
     G4Sphere* colSD = 
     new G4Sphere(
@@ -154,6 +154,5 @@ void LArDetectorConstruction::ConstructSDandField()
     auto collectorSD =
         new LArCollectorSD("colSD", "CollectorHitsCollection", 1);
     G4SDManager::GetSDMpointer()->AddNewDetector(collectorSD);
-    //SetSensitiveDetector("colLV", collectorSD);
-    SetSensitiveDetector("cdLV", collectorSD);
+    SetSensitiveDetector("colLV", collectorSD);
 }

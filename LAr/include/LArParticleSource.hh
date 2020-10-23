@@ -23,6 +23,7 @@ class LArParticleSource : public G4VPrimaryGenerator {
         // position distribution
         void SetPosDisType(G4String);
         void SetCentreCoords(G4ThreeVector);
+        void SetFVRadius(G4double);
         void GeneratePointSource();
         void GenerateUniformSource();
 

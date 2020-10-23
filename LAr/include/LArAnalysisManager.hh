@@ -3,6 +3,8 @@
 
 #include "globals.hh"
 #include "LArAnalysisMessenger.hh"
+#include <vector>
+#include "G4ThreeVector.hh"
 
 class LArAnalysisMessenger;
 
@@ -25,7 +27,11 @@ class LArAnalysisManager  {
         void analysePhotonNumber(G4int number);
         void analyseEventID(G4int evtid);
         void analyseInitPhotonNumber(G4int number);
+        void AddInitPos(G4ThreeVector);
+        void ClearInitPos();
         void analyseAddNtupleRow();
+
+        int getPosVecLength() {return vecInitPosX.size();}
 
 
     private:
@@ -36,6 +42,11 @@ class LArAnalysisManager  {
         static LArAnalysisManager* instance;
         
         LArAnalysisMessenger* analysisMessenger;
+
+    private:
+        std::vector<double> vecInitPosX;
+        std::vector<double> vecInitPosY;
+        std::vector<double> vecInitPosZ;
 
 };
 

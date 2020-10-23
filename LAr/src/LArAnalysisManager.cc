@@ -1,9 +1,3 @@
-/*************************************************************************
- @Author: MiaoYu ---> miaoyu@ihep.ac.cn
- @Created Time : Tue Sep 29 16:11:41 2020
- @File Name: LArAnalysisManager.cc
- ************************************************************************/
-
 #include "g4root.hh"
 
 #include "LArAnalysisManager.hh"
@@ -43,7 +37,9 @@ void LArAnalysisManager::book()
     man->CreateNtupleIColumn("EventID");
     man->CreateNtupleIColumn("nPhoton");
     man->CreateNtupleIColumn("nInitPhoton");
-    man->CreateNtupleDColumn("InitPosY");
+    //man->CreateNtupleDColumn("InitPosX", vecInitPosX);
+    //man->CreateNtupleDColumn("InitPosY", vecInitPosY);
+    //man->CreateNtupleDColumn("InitPosZ", vecInitPosZ);
     man->FinishNtuple();
     G4cout << "Created ntuple for photon counting" << G4endl;
 }
@@ -87,6 +83,23 @@ void LArAnalysisManager::analyseInitPhotonNumber(G4int number)
 {
     G4AnalysisManager* man = G4AnalysisManager::Instance();
     man->FillNtupleIColumn( 2, number );
+}
+
+void LArAnalysisManager::ClearInitPos()
+{
+    vecInitPosX.clear();
+    vecInitPosY.clear();
+    vecInitPosZ.clear();
+}
+
+void LArAnalysisManager::AddInitPos(G4ThreeVector vrt)
+{
+    G4double x = vrt.x();
+    G4double y = vrt.y();
+    G4double z = vrt.z();
+    vecInitPosX.push_back(x);
+    vecInitPosY.push_back(y);
+    vecInitPosZ.push_back(z);
 }
 
 

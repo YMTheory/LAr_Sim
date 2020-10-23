@@ -25,7 +25,7 @@ LArParticleSource::LArParticleSource ()  {
     EnergyDisType                  = "Mono";
     MonoEnergy                     = 1*MeV;
 
-    FV_radius                      = 85*cm;
+    FV_radius                      = 55*cm;
     theMessenger                   = new LArParticleSourceMessenger(this);
 }
 
@@ -51,6 +51,11 @@ void LArParticleSource::SetPosDisType(G4String PosType)
 void LArParticleSource::SetCentreCoords(G4ThreeVector coordsOfCentre)
 {
     CentreCoords = coordsOfCentre;
+}
+
+void LArParticleSource::SetFVRadius(G4double radius) 
+{
+    FV_radius = radius;
 }
 
 // generate point source
@@ -164,6 +169,7 @@ void LArParticleSource::GeneratePrimaryVertex(G4Event* event)  {
 
     LArAnalysisManager* analysis = LArAnalysisManager::getInstance();
     analysis->analyseInitPhotonNumber(NumberOfParticlesToBeGenerated);
+    analysis->ClearInitPos();
 
     for( G4int i=0; i<NumberOfParticlesToBeGenerated; i++ ) {
         // Position
@@ -176,6 +182,8 @@ void LArParticleSource::GeneratePrimaryVertex(G4Event* event)  {
             G4cout << "Generating point source" << G4endl;
             GeneratePointSource();
         }
+
+        analysis->AddInitPos(particle_position);
 
         GenerateIsotropicFlux();
 

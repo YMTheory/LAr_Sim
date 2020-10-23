@@ -59,9 +59,9 @@ void LArPhysicsList::ConstructOpticalProcess()
             G4cout << " ===> Registered Rayleigh Scatterinng Process " << G4endl;
         }
 
-        if(theBdProcess->IsApplicable(*particle)) {
-            pmanager -> AddDiscreteProcess(theBdProcess);
-            G4cout << " ===> Registered Boundary Process " << G4endl;
-        }
+        //if(theBdProcess->IsApplicable(*particle)) {
+        //    pmanager -> AddDiscreteProcess(theBdProcess);
+        //    G4cout << " ===> Registered Boundary Process " << G4endl;
+        //}
     }
 }
