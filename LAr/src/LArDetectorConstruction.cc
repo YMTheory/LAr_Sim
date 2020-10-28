@@ -38,11 +38,21 @@ G4VPhysicalVolume* LArDetectorConstruction::Construct()
 
 void LArDetectorConstruction::DefineMaterials()
 {
+    const G4int nEntries = 2;
+    G4double PhotonEnergy[nEntries] = {1.*eV, 10.*eV};
+
     // material: air
     G4NistManager* nist = G4NistManager::Instance();
     fAir = nist->FindOrBuildMaterial("G4_AIR");
     G4MaterialPropertiesTable* air_mpt = new G4MaterialPropertiesTable();
-    air_mpt -> AddConstProperty("RINDEX", 1.0);
+
+    G4double airRindex[nEntries] = {1.0, 1.0};
+    G4double airAbsLength[nEntries] = {10000*m, 10000*m};
+    G4double airRayleigh[nEntries] = {10000*m, 10000*m};
+    air_mpt -> AddProperty("RINDEX", PhotonEnergy, airRindex, nEntries);
+    air_mpt -> AddProperty("ABSLENGTH", PhotonEnergy, airAbsLength, nEntries);
+    air_mpt -> AddProperty("RAYLEIGH", PhotonEnergy, airRayleigh, nEntries);
+    
     fAir -> SetMaterialPropertiesTable(air_mpt);
 
     // material: LAr
@@ -51,7 +61,15 @@ void LArDetectorConstruction::DefineMaterials()
     density = 1.390*g/cm3;
     a = 39.95*g/mole;
     fLAr = new G4Material(name="liquidArgon", z=18., a, density);
+    G4MaterialPropertiesTable* lar_mpt = new G4MaterialPropertiesTable();
 
+    G4double larRindex[nEntries] = {1.4, 1.4};
+    G4double larAbsLength[nEntries] = {1*m, 1*m};
+    G4double larRayleigh[nEntries] = {1*m, 1*m};
+    lar_mpt -> AddProperty("RINDEX", PhotonEnergy, larRindex, nEntries);
+    lar_mpt -> AddProperty("ABSLENGTH", PhotonEnergy, larAbsLength, nEntries);
+    lar_mpt -> AddProperty("RAYLEIGH", PhotonEnergy, larRayleigh, nEntries);
+    fLAr -> SetMaterialPropertiesTable(lar_mpt);
 }
 
 
@@ -110,6 +128,7 @@ G4VPhysicalVolume* LArDetectorConstruction::DefineVolumes()
         );
 
     G4VisAttributes* cdVisAtt = new G4VisAttributes(G4Colour(0, 1, 1));
+    cdVisAtt->SetForceSolid();
     cdLV->SetVisAttributes(cdVisAtt);
 
     /// photon collector
@@ -127,7 +146,8 @@ G4VPhysicalVolume* LArDetectorConstruction::DefineVolumes()
     G4LogicalVolume* colLV = 
     new G4LogicalVolume(
             colSD,
-            fLAr,
+            //fLAr,
+            fAir,
             "colLV"
         );
 
@@ -135,7 +155,7 @@ G4VPhysicalVolume* LArDetectorConstruction::DefineVolumes()
             0,
             G4ThreeVector(),
             colLV,
-            "worldLV",
+            "colPV",
             worldLV,
             false,
             0,
