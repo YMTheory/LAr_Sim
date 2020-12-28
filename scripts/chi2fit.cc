@@ -1,14 +1,35 @@
 #include <iostream>
 #include <TF1.h>
 #include <TMath.h>
+#include <TGraph.h>
 #include <TGraphErrors.h>
 #include <TMinuit.h>
 
 using namespace std;
 
-Int_t option = 1; // 0 for Babicz, 1 for Zhou
+Int_t option = 0; // 0 for Babicz, 1 for Zhou
+Int_t constrain = 1; // whether use amplitude ratio constraints
+
+Double_t abs_ratio = 0.947;  // fitting from Raz's data
 
 Double_t rindex128_data;
+Double_t ray128_data;
+
+Int_t n_par = 4;
+Double_t m_parameters[10]; 
+Double_t m_parerror[10];
+
+// systematic uncertainties :
+Double_t sigma_lambda = 0.01;   // Argon resonance peak1
+Double_t sigma_R = 0.04;        // Xe Absorption peak ratio
+Double_t sigma_f = 1;           // Fresnel Correction 
+// nuisance parameters:
+Double_t nu_lambda = 0;
+Double_t nu_R = 0;
+Double_t nu_f = 0;
+
+// Lagrange multipler method:
+Double_t global_l = 0;
 
 Double_t gRindex(Double_t* x, Double_t* p) 
 {
@@ -46,6 +67,30 @@ Double_t gRindex20(Double_t* x, Double_t* p)
 
 TF1* fRindex20 = new TF1("fRindex20", gRindex20, 0.1, 0.7, 3);
 
+Double_t gRayLength(Double_t* x, Double_t* p)
+{
+    Double_t l = x[0];  // wavelength um
+    Double_t rindex = p[0];  // rindex
+    Double_t delta = p[1];   // depolarization
+
+    Double_t kT = 2.24442E-9;
+    Double_t kB = 1.380649E-23;
+    Double_t T = 90; // K
+    Double_t f = 1e22;
+    
+    Double_t pi = TMath::Pi();
+
+    //Double_t rayL = 1 / (8*TMath::Power(pi, 3)/3/TMath::Power(l, 4)
+    //            * ((rindex*rindex-1)*(rindex*rindex+2)/3)*((rindex*rindex-1)*(rindex*rindex+2)/3) * kT * kB * T * f );
+
+    Double_t rayL = 1 / (8*TMath::Power(pi, 3)/3/TMath::Power(l, 4)
+                * ((rindex*rindex-1)*(rindex*rindex+2)/3)*((rindex*rindex-1)*(rindex*rindex+2)/3) * kT * kB * T * f * (6+3*delta)/(6-7*delta));
+
+    return rayL;
+}
+
+TF1* fRayLength = new TF1("fRayLength", gRayLength, 0.118, 0.150, 2);
+
 
 TGraphErrors* gRindexData = new TGraphErrors();
 void SetData()
@@ -80,22 +125,106 @@ void SetData()
 
 }
 
+TGraphErrors* gTransData = new TGraphErrors();
+void LoadTrans()
+{
+    ifstream in; in.open("./G140ppb.txt");
+    string line;
+    Double_t m_wl, m_tran, m_tran_err;
+    Int_t idx = 0;
+    while(getline(in, line)) {
+        istringstream ss(line);
+        ss >> m_wl >> m_tran >> m_tran_err;
+        if( m_wl>125 ) {
+            gTransData->SetPoint(idx, m_wl/1000., m_tran);
+            gTransData->SetPointError(idx, 0, m_tran_err);
+            idx++;
+        }
+    }
+}
+
+
+Double_t gCorr(Double_t* x, Double_t* p)
+{
+    Double_t wl = x[0]*1000.;
+    Double_t E = 1240./wl;
+
+    Double_t a = 38.;
+    Double_t E0 = 12.8234;
+    Double_t gamma = 0.42357;
+    Double_t b = 247.188;
+    Double_t E1 = 18.8448;
+
+    Double_t n_MgF2 = TMath::Sqrt(1+a*(E0*E0-E*E)/((E0*E0-E*E)*(E0*E0-E*E)+gamma*E*E) + b/(E1*E1-E*E));
+
+    Double_t n_vac = 1.;
+    Double_t n_LAr = p[0];
+
+    return 1/TMath::Power( (1-TMath::Power((n_vac-n_MgF2)/(n_vac+n_MgF2),2))/(1-TMath::Power((n_MgF2-n_LAr)/(n_MgF2+n_LAr) ,2))  ,2);
+}
+
+TF1* fCorr = new TF1("fCorr", gCorr, 0.1, 0.2, 1);
+
+Double_t gAbs(Double_t* x, Double_t* p)
+{
+    Double_t l = x[0]*1000;
+    Double_t A2 = p[0];
+    Double_t mu1 = p[1];
+    Double_t sigma1 = p[2];
+    Double_t mu2 = p[3];
+    Double_t sigma2 = p[4];
+    Double_t A1;
+    if (constrain == 0) // two independent peaks
+        A1 = p[5];
+    else 
+        A1 = abs_ratio * A2;
+
+    Double_t A_abs = A1*TMath::Exp(-(l-mu1)*(l-mu1)/2/sigma1/sigma1) + A2*TMath::Exp(-(l-mu2)*(l-mu2)/2/sigma2/sigma2);
+    Double_t T_abs = TMath::Exp( -A_abs*TMath::Log(10.) );
+    return T_abs;
+}
+TF1* fAbs = new TF1("fAbs", gAbs, 0.125, 0.15, 6);
+    
 void  SetParameters(double *par)
 {
     if(option == 1) {
         fRindex->SetParameter(0, par[0]);
         fRindex->SetParameter(1, par[1]);
         fRindex->SetParameter(2, par[2]);
+        fRayLength->SetParameter(1, par[3]);
+        fAbs->SetParameter(0, par[4]);
+        fAbs->SetParameter(1, par[5]);
+        fAbs->SetParameter(2, par[6]);
+        fAbs->SetParameter(3, par[7]);
+        fAbs->SetParameter(4, par[8]);
+        nu_lambda = par[9];
+        nu_R = par[10];
+        nu_f = par[11];
+        if (constrain == 0)
+            fAbs->SetParameter(5, par[12]);
     } else if (option == 0) {
         fRindex20->SetParameter(0, par[0]);
         fRindex20->SetParameter(1, par[1]);
         fRindex20->SetParameter(2, par[2]);
+        fRayLength->SetParameter(1, par[3]);
+        fAbs->SetParameter(0, par[4]);
+        fAbs->SetParameter(1, par[5]);
+        fAbs->SetParameter(2, par[6]);
+        fAbs->SetParameter(3, par[7]);
+        fAbs->SetParameter(4, par[8]);
+        nu_lambda = par[9];
+        nu_R = par[10];
+        nu_f = par[11];
+        if (constrain == 0)
+            fAbs->SetParameter(5, par[12]);
     }
 }
 
 Double_t GetChi2()
 {
     Double_t chi2 = 0;
+
+    // rindex data part
     for (int i=0; i<gRindexData->GetN(); i++) {
         Double_t dataX = gRindexData->GetPointX(i);
         Double_t dataY = gRindexData->GetPointY(i);
@@ -105,6 +234,7 @@ Double_t GetChi2()
         else if (option==0)
             predY = fRindex20->Eval(dataX);
         Double_t dataE = gRindexData->GetEY()[i];
+        //std::cout <<  "rindex fitting: " << dataX << " " << dataY << " " << predY << std::endl;
         chi2 += (predY-dataY)*(predY-dataY)/dataE/dataE;
     }
 
@@ -120,11 +250,14 @@ Double_t GetChi2()
         Double_t dndl = (part1+part2)/part3;
         Double_t dataY = 2.238 + dndl * 0.128;
         Double_t predY = fRindex20->Eval(0.128);
-        rindex128_data = dataY;
+        rindex128_data = predY;
+        predY *= (1 + nu_lambda);   // nuisance parameter for resonance peak wavelength
 
         Double_t dataE = 0.03*0.3;
 
-        chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;
+        chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;  // statistic part
+
+        chi2 += (nu_lambda/sigma_lambda) * (nu_lambda/sigma_lambda);   // systematic part
     }
     else if (option==1) {
         // delta chi2 at 128 for Zhou
@@ -137,15 +270,50 @@ Double_t GetChi2()
         Double_t dndl = part1/(part2*part3);
         Double_t dataY = 2.238 + dndl*0.128;
         Double_t predY = fRindex->Eval(0.128);
-        rindex128_data = dataY;
+        rindex128_data = predY;
+        predY *= (1 + nu_lambda);   // nuisance parameter for resonance peak wavelength
 
         Double_t dataE = 0.03*0.3;
 
         chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;
+
+        chi2 += (nu_lambda/sigma_lambda) * (nu_lambda/sigma_lambda);   // systematic part
+    }
+
+    // transmission part:
+    for (Int_t ibin=0; ibin<gTransData->GetN(); ibin++) {
+        Double_t wl = gTransData->GetPointX(ibin);
+        Double_t rindex;
+        if (option == 0)
+            rindex = fRindex20->Eval(wl);
+        else if (option == 1)
+            rindex = fRindex->Eval(wl);
+        fRayLength->SetParameter(0, rindex);
+        Double_t d = 5.8;
+        Double_t rayL = fRayLength->Eval(wl);
+        Double_t T_Ray = TMath::Exp(-d/rayL);
+        fCorr->SetParameter(0, rindex);
+        Double_t corr = fCorr->Eval(wl);
+        //fAbs->SetParameters(0.3985, 126.5, 1.04, 0.4122, 140.1, 1.566);
+        Double_t T_abs = fAbs->Eval(wl);
+        Double_t trans_pred = T_Ray * T_abs * corr;
+        trans_pred *= (1+nu_R) * (1+nu_f);   // nuisance parameters
+        Double_t trans_data = gTransData->GetPointY(ibin);
+        Double_t trans_err  =gTransData->GetEY()[ibin];
         
+        chi2 += (trans_pred - trans_data)*(trans_pred-trans_data) / trans_err / trans_err;   // statistic part
+
+        chi2 += (nu_R/sigma_R)*(nu_R/sigma_R);
+        chi2 += (nu_f/sigma_f)*(nu_f/sigma_f);
     }
 
     //cout << "Delta_chi2 = " << chi2 << endl;
+
+    // use Lagrange multiple mothed:
+    Double_t n128 = fRindex20->Eval(0.128);
+    fRayLength->SetParameter(0, n128);
+    chi2 += global_l * fRayLength->Eval(0.128);
+
     return chi2;
 }
 
@@ -171,15 +339,40 @@ double GetChiSquare(double maxChi2)
 
     // configure parameters
     if(option == 1) {
-        minuit->mnparm(iPar, "fa", 0.2, 0.001, 0., 1., ierrflag); iPar++;
-        minuit->mnparm(iPar, "fb", 0.04, 0.001, 0., 1., ierrflag); iPar++;
-        minuit->mnparm(iPar, "fc", 4.3, 0.01, 0., 10., ierrflag); iPar++;
+        minuit->mnparm(iPar, "fa", 0.2, 0.001, 0., 1., ierrflag);     iPar++;
+        minuit->mnparm(iPar, "fb", 0.04, 0.001, 0., 1., ierrflag);    iPar++;
+        minuit->mnparm(iPar, "fc", 4.3, 0.01, 0., 10., ierrflag);     iPar++;
+        minuit->mnparm(iPar, "delta", 0.0, 0.01, 0., 5., ierrflag);   iPar++;
+        minuit->mnparm(iPar, "A1", 0.3, 0.01, 0., 1., ierrflag);      iPar++;
+        minuit->mnparm(iPar, "mu1",126, 0.1, 123, 129, ierrflag);     iPar++;
+        minuit->mnparm(iPar, "sigma1", 1, 0.01, 0.5, 2, ierrflag);    iPar++;
+        minuit->mnparm(iPar, "mu2",140, 0.1, 135, 145, ierrflag);     iPar++;
+        minuit->mnparm(iPar, "sigma2", 1.5, 0.01, 0.5, 2, ierrflag);  iPar++;
+        minuit->mnparm(iPar, "nu_lambda", 0, 0.01, 0., 1., ierrflag); iPar++;
+        minuit->mnparm(iPar, "nu_R", 0, 0.01, 0., 1., ierrflag); iPar++;
+        minuit->mnparm(iPar, "nu_f", 0, 0.01, 0., 1., ierrflag); iPar++;
+        if (constrain == 0)
+            minuit->mnparm(iPar, "A1", 0.2, 0.01, 0., 1., ierrflag);  iPar++;
+
     } 
     else if (option==0) {
-        minuit->mnparm(iPar, "a0", 0.3, 0.001, 0., 1., ierrflag); iPar++;
-        minuit->mnparm(iPar, "a1", 0.1, 0.001, 0., 1., ierrflag); iPar++;
-        minuit->mnparm(iPar, "a2", 0.01, 0.001, 0., 1., ierrflag); iPar++;
+        minuit->mnparm(iPar, "a0", 0.3, 0.001, 0., 1., ierrflag);     iPar++;
+        minuit->mnparm(iPar, "aUV", 0.1, 0.001, 0., 1., ierrflag);    iPar++;
+        minuit->mnparm(iPar, "aIR", 0.01, 0.001, 0., 1., ierrflag);   iPar++;
+        minuit->mnparm(iPar, "delta", 0.0, 0.01, 0., 5., ierrflag);   iPar++;
+        minuit->mnparm(iPar, "A2", 0.3, 0.01, 0., 0., ierrflag);      iPar++;
+        minuit->mnparm(iPar, "mu1",126, 0.1, 123, 129, ierrflag);     iPar++;
+        minuit->mnparm(iPar, "sigma1", 1, 0.01, 0.5, 2, ierrflag);    iPar++;
+        minuit->mnparm(iPar, "mu2",140, 0.1, 135, 145, ierrflag);     iPar++;
+        minuit->mnparm(iPar, "sigma2", 1.5, 0.01, 0.5, 2, ierrflag);  iPar++;
+        minuit->mnparm(iPar, "nu_lambda", 0, 0.01, 0., 1., ierrflag); iPar++;
+        minuit->mnparm(iPar, "nu_R", 0, 0.01, 0., 1., ierrflag); iPar++;
+        minuit->mnparm(iPar, "nu_f", 0, 0.01, 0., 1., ierrflag); iPar++;
+        if (constrain == 0)
+            minuit->mnparm(iPar, "A1", 0.2, 0.01, 0., 1., ierrflag);  iPar++;
     }
+
+    //minuit->FixParameter(4);
 
     // Minimization strategy
     minuit->SetErrorDef(1);
@@ -196,15 +389,22 @@ double GetChiSquare(double maxChi2)
 
     //minuit->mnexcm("SHOw COVariance", arglist, 0, ierrflag);
 
+    for (Int_t i=0; i<n_par; i++) {
+        minuit->GetParameter(i, m_parameters[i], m_parerror[i]);
+    }
+
     cout << " ====================== " << endl;
     cout << "    minChi2: " << min << endl;
     cout << " ====================== " << endl;
+
+    Double_t n128 = fRindex20->Eval(0.128);
+    fRayLength->SetParameter(0, n128);
     delete minuit;
     return min;
 
 }
 
-void Draw()
+void DrawRindex()
 {
     gRindexData->SetMarkerColor(kViolet+1);
     gRindexData->SetMarkerStyle(20);
@@ -239,21 +439,70 @@ void Draw()
     gRindexData->Draw("AP");
     gCalc->Draw("L SAME");
     gRindex128->Draw("P SAME");
-    //cc->SaveAs("rindexZhou_GV.pdf");
+    //cc->SaveAs("rindexBa_allerr.png");
 
 }
 
+
+void DrawTrans()
+{
+    TGraph* pred_graph = new TGraph();
+    for (Int_t i=0; i<1000; i++) {
+        Double_t wl = ((150.-125.)/1000*i + 125. )/1000.;
+        Double_t rindex;
+        if (option == 0)
+            rindex = fRindex20->Eval(wl);
+        else if (option == 1)
+            rindex = fRindex->Eval(wl);
+        fRayLength->SetParameter(0, rindex);
+        fRayLength->SetParameter(1, m_parameters[3]);
+        fCorr->SetParameter(0, rindex);
+        Double_t corr = fCorr->Eval(wl);
+        Double_t rayL = fRayLength->Eval(wl);
+        Double_t T_abs = fAbs->Eval(wl);
+        Double_t T_Ray = TMath::Exp(-5.8/(rayL)) ;
+        Double_t trans_pred = T_Ray * T_abs * corr;
+        pred_graph->SetPoint(i, wl, trans_pred);
+
+        if (i == 128)
+            cout << "Rayleigh scattering length @128nm : " << rayL << endl;
+    }
+
+    gTransData->SetMarkerColor(kBlue+1);
+    gTransData->SetLineColor(kBlue+1);
+    gTransData->SetMarkerSize(0.5);
+    gTransData->SetMarkerStyle(20);
+    gTransData->SetLineWidth(2);
+
+    pred_graph->SetLineColor(kGreen+1);
+    pred_graph->SetLineWidth(3);
+
+    TCanvas* cg = new TCanvas();
+    gTransData->SetTitle("Transmission; wavelength/um; transmission");
+    //gTransData->GetXaxis()->SetLimits(0.11, 0.7);
+    //gTransData->GetYaxis()->SetRangeUser(1.2, 1.45);
+    gTransData->Draw("AP");
+    pred_graph->Draw("L SAME");
+
+    //cg->SaveAs("transBa_allerr.png");
+}
+
+
 void chi2fit()
 {
+    SetData();
+    LoadTrans();
+
+    GetChiSquare(1);
+
+    DrawRindex();
+    DrawTrans();
+
     if (option == 0) 
         cout << "Use Babicz's Model Fitting" << endl;
     else if (option == 1)
         cout << "Use Zhou's Model Fitting" << endl;
-    SetData();
-    cout << "Total Measurement data number: " << gRindexData->GetN() << endl;
+    cout << "Total Measurement data number: " << gRindexData->GetN()+gTransData->GetN()+1 << endl;
 
-    GetChiSquare(1);
-
-    Draw();
 }
 

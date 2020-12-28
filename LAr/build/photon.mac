@@ -1,0 +1,16 @@
+/run/initialize
+/LAr/det/setRadius 100 cm
+
+# verbose config
+/control/verbose 0
+/run/verbose 0
+/tracking/verbose 0
+
+/LAr/gun/particle opticalphoton
+/LAr/gun/number 100
+/LAr/gun/energy 2.884 eV
+/LAr/gun/type Point
+/LAr/gun/center 0 0 0 mm
+/LAr/gun/fv 80 cm
+
+/run/beamOn 1
