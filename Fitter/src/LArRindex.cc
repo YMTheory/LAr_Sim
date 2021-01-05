@@ -42,7 +42,7 @@ double gRindex20(double *x, double *p) {
 
 }
 
-int LArRindex::option = 0;
+int LArRindex::option = 1;
 double LArRindex::m_p0 = 0.335;
 double LArRindex::m_p1 = 0.099;
 double LArRindex::m_p2 = 0.008;
@@ -204,5 +204,5 @@ void LArRindex::Plot()
     gData128nm->Draw("P SAME");
     gDraw->Draw("L SAME");
 
-    cc->SaveAs("Rindex.pdf");
+    //cc->SaveAs("RindexBa_nodelta.pdf");
 }

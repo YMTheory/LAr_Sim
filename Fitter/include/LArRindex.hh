@@ -24,6 +24,7 @@ class LArRindex
         static double getp2()        {return m_p2;}
         static void setnulambda(double nulambda) {m_nulambda = nulambda;}
         static double getnulambda()  {return m_nulambda;}
+        static int getoption()       {return option;}
         static void SetParameters();
 
         static void Plot();

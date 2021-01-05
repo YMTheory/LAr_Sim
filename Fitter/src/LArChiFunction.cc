@@ -66,9 +66,15 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     int iPar = 0;
     LArMinuit->mnexcm("CLEAR", arglist, 0, ierrflag);
 
-    LArMinuit->mnparm(iPar, "p0", 0.335, 0.01, 0., 1., ierrflag);     iPar++;
-    LArMinuit->mnparm(iPar, "p1", 0.099, 0.001, 0., 1., ierrflag);     iPar++;
-    LArMinuit->mnparm(iPar, "p2", 0.008, 0.001, 0., 1., ierrflag);    iPar++;
+    if(LArRindex::getoption() ==1) {
+        LArMinuit->mnparm(iPar, "p0", 0.207, 0.01, 0., 1., ierrflag);     iPar++;
+        LArMinuit->mnparm(iPar, "p1", 0.041, 0.001, 0., 1., ierrflag);     iPar++;
+        LArMinuit->mnparm(iPar, "p2", 4.333, 0.001, 0., 5., ierrflag);    iPar++;
+    } else if (LArRindex::getoption() == 0) {
+        LArMinuit->mnparm(iPar, "p0", 0.335, 0.001, 0., 1., ierrflag);     iPar++;
+        LArMinuit->mnparm(iPar, "p1", 0.099, 0.001, 0., 1., ierrflag);     iPar++;
+        LArMinuit->mnparm(iPar, "p2", 0.008, 0.001, 0., 1., ierrflag);    iPar++;
+    }
     LArMinuit->mnparm(iPar, "delta", 0.0, 0.01, 0., 1., ierrflag);   iPar++;
     LArMinuit->mnparm(iPar, "A1", 0.3, 0.01, 0., 0., ierrflag);      iPar++;
     LArMinuit->mnparm(iPar, "mu1",126, 0.1, 123, 129, ierrflag);     iPar++;
@@ -78,6 +84,9 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     LArMinuit->mnparm(iPar, "sigma2", 1.5, 0.01, 0.5, 2, ierrflag);  iPar++;
     LArMinuit->mnparm(iPar, "nu_lambda", 0, 0.01, 0, 1, ierrflag);   iPar++;
     LArMinuit->mnparm(iPar, "nu_f", 0, 0.01, 0, 1, ierrflag);   iPar++;
+    
+    if(LArTrans::getdepolarization() == 0)
+        LArMinuit->FixParameter(3);
 
     // Minimization strategy
     LArMinuit->SetErrorDef(1);

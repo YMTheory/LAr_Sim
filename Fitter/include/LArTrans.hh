@@ -35,6 +35,7 @@ class LArTrans
         static double getsigma2()            {return m_sigma2;}
         static void setnuf(double nu_f)      {m_nuf = nu_f;}
         static double getnuf()               {return m_nuf;}
+        static int getdepolarization()       {return depolarization;}
         static void SetParameters();
 
     private:
