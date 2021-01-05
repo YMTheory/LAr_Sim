@@ -8,24 +8,26 @@
 class LArChiFunction
 {
     public:
-        LArChiFunction(LArRindex* rdx, LArTrans* trans);
+        LArChiFunction();
         ~LArChiFunction();
 
         void Initialize();
 
-        void GetChiSquare();
-        void SetParameters(double *par);
-        double GetChi2();
+        double GetChiSquare(double maxChi2);
+        static void SetParameters(double *par);
+        static double GetChi2();
 
-        void Plot();
+        static void Plot();
 
     private:
-        void ChisqFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag);
+        static void ChisqFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag);
         TMinuit* LArMinuit;
     
     private:
-        LArRindex* gRdx;
-        LArTrans* gTrans;
+        static double m_chi2;
+        static double m_chi2Min;
+        static bool m_DoFit;
+
 
 };
 

@@ -21,8 +21,8 @@ double gRindex(Double_t* x, Double_t* p)
     double b = p[1];
     double c = p[2];
 
-    return TMath::Sqrt((3/(1-(A*rho_ratio*(a/(l1-1/l/l)+b/(l2-1/l/l)+c/(l3-1/l/l)))))-2);
-
+    double n = TMath::Sqrt((3/(1-(A*rho_ratio*(a/(l1-1/l/l)+b/(l2-1/l/l)+c/(l3-1/l/l)))))-2);
+    return n;
 }
 
 
@@ -42,20 +42,47 @@ double gRindex20(double *x, double *p) {
 
 }
 
+int LArRindex::option = 0;
+double LArRindex::m_p0 = 0.335;
+double LArRindex::m_p1 = 0.099;
+double LArRindex::m_p2 = 0.008;
+double LArRindex::m_nulambda = 0;
+double LArRindex::sigma_lambda = 0.01;
+TGraphErrors* LArRindex::gData = new TGraphErrors();
+TGraphErrors* LArRindex::gCalc = new TGraphErrors();
+TGraphErrors* LArRindex::gData128nm = new TGraphErrors();
+TF1* LArRindex::fRindex ;
+
 LArRindex::LArRindex()
+{}
+
+LArRindex::~LArRindex()
+{;}
+
+void LArRindex::Initialize()
 {
-    option = 0;
-    if (option==1)
+    if (option==1) {
         fRindex = new TF1("fRindex", gRindex, 0.1, 0.7, 3);
-    else if (option==0)
+        cout << "==========> We use Our Model" << endl;
+    }
+    else if (option==0) {
         fRindex = new TF1("fRindex", gRindex20, 0.1, 0.7, 3);
-    gData = new TGraphErrors();
-    gCalc = new TGraphErrors();
-    gData128nm = new TGraphErrors();
+        cout << "==========> We use Babicz's Model" << endl;
+    }
+
+    LoadData();
+
+}
+
+void LArRindex::SetParameters()
+{
+    fRindex->SetParameters(m_p0, m_p1, m_p2);
 }
 
 double LArRindex::GetChi2()
 {
+    Calculate();
+
     double chi2 = 0;
 
     double* datay = gData->GetY();
@@ -83,13 +110,13 @@ double LArRindex::GetChi2()
         Double_t dndl = (part1+part2)/part3;
         Double_t dataY = 2.238 + dndl * 0.128;
         Double_t predY = fRindex->Eval(0.128);
-        //predY *= (1 + nu_lambda);   // nuisance parameter for resonance peak wavelength
+        predY *= (1 + m_nulambda);   // nuisance parameter for resonance peak wavelength
 
         Double_t dataE = 0.03*0.3;
 
         chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;  // statistic part
 
-        //chi2 += (nu_lambda/sigma_lambda) * (nu_lambda/sigma_lambda);   // systematic part
+        chi2 += (m_nulambda/sigma_lambda) * (m_nulambda/sigma_lambda);   // systematic part
     }
     else if (option==1) {
         // delta chi2 at 128 for Zhou
@@ -102,13 +129,13 @@ double LArRindex::GetChi2()
         Double_t dndl = part1/(part2*part3);
         Double_t dataY = 2.238 + dndl*0.128;
         Double_t predY = fRindex->Eval(0.128);
-        //predY *= (1 + nu_lambda);   // nuisance parameter for resonance peak wavelength
+        predY *= (1 + m_nulambda);   // nuisance parameter for resonance peak wavelength
 
         Double_t dataE = 0.03*0.3;
 
         chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;
 
-        //chi2 += (nu_lambda/sigma_lambda) * (nu_lambda/sigma_lambda);   // systematic part
+        chi2 += (m_nulambda/sigma_lambda) * (m_nulambda/sigma_lambda);   // systematic part
     }
 
     return chi2;
@@ -116,6 +143,7 @@ double LArRindex::GetChi2()
 
 void LArRindex::LoadData()
 {
+    cout << "+++++++++++++++++++++ Load Rindex Data ... " << endl;
     Int_t i = 0;
     gData->SetPoint(i, 0.3612, 1.2326); i++;
     gData->SetPoint(i, 0.3650, 1.2331); i++;
@@ -133,15 +161,9 @@ void LArRindex::LoadData()
 
 }
 
-void LArRindex::SetParameters(double* par)
-{
-    fRindex->SetParameter(0, par[0]);
-    fRindex->SetParameter(1, par[1]);
-    fRindex->SetParameter(2, par[2]);
-}
-
 void LArRindex::Calculate()
 {
+    SetParameters();
     double* datax = gData->GetX();
     for (int i=0; i<gData->GetN(); i++) {
         double calc = fRindex->Eval(datax[i]);
@@ -174,7 +196,7 @@ void LArRindex::Plot()
     gDraw->SetLineColor(kGreen+1);
     gDraw->SetLineWidth(2);
 
-    TCanvas* cc = new TCanvas();
+    TCanvas* cc = new TCanvas("cc", "", 800, 600); cc->cd();
     gData->GetXaxis()->SetLimits(0.11, 0.7);
     gData->GetYaxis()->SetRangeUser(1.2, 1.45);
 
@@ -182,5 +204,5 @@ void LArRindex::Plot()
     gData128nm->Draw("P SAME");
     gDraw->Draw("L SAME");
 
-    cc->SaveAs("test.pdf");
+    cc->SaveAs("Rindex.pdf");
 }
