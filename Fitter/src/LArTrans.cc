@@ -224,7 +224,7 @@ void LArTrans::Plot()
     //gTransData->GetYaxis()->SetRangeUser(1.2, 1.45);
     gData->Draw("AP");
     pred_graph->Draw("L SAME");
-//    cg->SaveAs("TransBa_nodelta.pdf");
+    cg->SaveAs("TransBa_fixed_nodelta.pdf");
 }
 
 

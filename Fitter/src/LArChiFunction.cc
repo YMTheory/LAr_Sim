@@ -68,7 +68,7 @@ double LArChiFunction::GetChiSquare(double maxChi2)
 
     if(LArRindex::getoption() ==1) {
         LArMinuit->mnparm(iPar, "p0", 0.207, 0.01, 0., 1., ierrflag);     iPar++;
-        LArMinuit->mnparm(iPar, "p1", 0.041, 0.001, 0., 1., ierrflag);     iPar++;
+        LArMinuit->mnparm(iPar, "p1", 0.0415, 0.001, 0., 1., ierrflag);     iPar++;
         LArMinuit->mnparm(iPar, "p2", 4.333, 0.001, 0., 5., ierrflag);    iPar++;
     } else if (LArRindex::getoption() == 0) {
         LArMinuit->mnparm(iPar, "p0", 0.335, 0.001, 0., 1., ierrflag);     iPar++;
@@ -87,6 +87,11 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     
     if(LArTrans::getdepolarization() == 0)
         LArMinuit->FixParameter(3);
+
+    // use values from Zhou's note
+    LArMinuit->FixParameter(0);
+    LArMinuit->FixParameter(1);
+    LArMinuit->FixParameter(2);
 
     // Minimization strategy
     LArMinuit->SetErrorDef(1);

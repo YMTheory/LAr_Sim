@@ -204,5 +204,5 @@ void LArRindex::Plot()
     gData128nm->Draw("P SAME");
     gDraw->Draw("L SAME");
 
-    //cc->SaveAs("RindexBa_nodelta.pdf");
+    cc->SaveAs("RindexBa_fixed_nodelta.pdf");
 }
