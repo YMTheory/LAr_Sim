@@ -56,6 +56,7 @@ double gAbs(Double_t* x, Double_t* p)
     Double_t A2 = p[3];
     Double_t mu2 = p[4];
     Double_t sigma2 = p[5];
+    //Double_t A1 = A2 * p[0]; // p0 is the peak amp ratio;
 
     Double_t A_abs = A1*TMath::Exp(-(l-mu1)*(l-mu1)/2/sigma1/sigma1) + A2*TMath::Exp(-(l-mu2)*(l-mu2)/2/sigma2/sigma2);
     Double_t T_abs = TMath::Exp( -A_abs*TMath::Log(10.) );

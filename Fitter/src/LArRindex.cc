@@ -42,7 +42,7 @@ double gRindex20(double *x, double *p) {
 
 }
 
-int LArRindex::option = 1;
+int LArRindex::option = 0;  // 0 for Babicz, 1 for ours
 double LArRindex::m_p0 = 0.335;
 double LArRindex::m_p1 = 0.099;
 double LArRindex::m_p2 = 0.008;

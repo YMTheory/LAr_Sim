@@ -19,6 +19,7 @@ class LArTrans
         static double GetChi2();
         static void Plot();
 
+        static void setrindex(double rindex) {fRayLength->SetParameter(0, rindex);}
         static void setdelta(double delta)   {m_delta = delta;}
         static double getdelta()             {return m_delta;}
         static void setA1(double A1)         {m_A1 = A1;}
@@ -37,6 +38,8 @@ class LArTrans
         static double getnuf()               {return m_nuf;}
         static int getdepolarization()       {return depolarization;}
         static void SetParameters();
+
+        static double CalcRayLength(double wl) {return fRayLength->Eval(wl);}
 
     private:
         static TGraphErrors* gData;
