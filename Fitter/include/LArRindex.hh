@@ -29,7 +29,7 @@ class LArRindex
 
         static void Plot();
 
-        static double CalcRindex(double wl) {return fRindex->Eval(wl);}
+        static double CalcRindex(double wl);
 
     private:
         static TGraphErrors* gData;

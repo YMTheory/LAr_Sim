@@ -1,4 +1,5 @@
 #include "LArRindex.hh"
+#include "LArConfiguration.hh"
 
 #include "TF1.h"
 #include "TMath.h"
@@ -6,7 +7,6 @@
 #include "TAxis.h"
 
 using namespace std;
-
 
 double gRindex(Double_t* x, Double_t* p) 
 {
@@ -42,7 +42,7 @@ double gRindex20(double *x, double *p) {
 
 }
 
-int LArRindex::option = 0;  // 0 for Babicz, 1 for ours
+int LArRindex::option = LArConfiguration::rindex_model;
 double LArRindex::m_p0 = 0.335;
 double LArRindex::m_p1 = 0.099;
 double LArRindex::m_p2 = 0.008;
@@ -58,6 +58,13 @@ LArRindex::LArRindex()
 
 LArRindex::~LArRindex()
 {;}
+
+double LArRindex::CalcRindex(double wl) {
+    if (wl == 0.128)
+        return fRindex->Eval(wl) * (1+m_nulambda);
+    else
+        return fRindex->Eval(wl);
+}
 
 void LArRindex::Initialize()
 {
@@ -199,10 +206,11 @@ void LArRindex::Plot()
     TCanvas* cc = new TCanvas("cc", "", 800, 600); cc->cd();
     gData->GetXaxis()->SetLimits(0.11, 0.7);
     gData->GetYaxis()->SetRangeUser(1.2, 1.45);
+    gData->SetTitle("rindex fitting; wavelength/um; rindex");
 
     gData->Draw("AP");
     gData128nm->Draw("P SAME");
     gDraw->Draw("L SAME");
 
-    cc->SaveAs("RindexBa_fixed_nodelta.pdf");
+    cc->SaveAs("Rindex.pdf");
 }

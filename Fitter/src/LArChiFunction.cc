@@ -6,6 +6,8 @@
 
 using namespace std;
 
+int LArChiFunction::usePull = 1;
+
 double LArChiFunction::m_chi2;
 double LArChiFunction::m_chi2Min;
 bool LArChiFunction::m_DoFit;
@@ -83,8 +85,8 @@ double LArChiFunction::GetChiSquare(double maxChi2)
         LArMinuit->mnparm(iPar, "p2", 0.008, 0.001, 0., 1., ierrflag);    iPar++;
     }
     LArMinuit->mnparm(iPar, "delta", 0.0, 0.01, 0., 1., ierrflag);   iPar++;
-    //LArMinuit->mnparm(iPar, "ratio", 0.94, 0.001, 0.90, 1.0, ierrflag);      iPar++;
-    LArMinuit->mnparm(iPar, "A1", 0.3, 0.01, 0., 0., ierrflag);      iPar++;
+    LArMinuit->mnparm(iPar, "ratio", 0.947, 0.001, 0.90, 1.0, ierrflag);      iPar++;
+    //LArMinuit->mnparm(iPar, "A1", 0.3, 0.01, 0., 0., ierrflag);      iPar++;
     LArMinuit->mnparm(iPar, "mu1",126, 0.1, 123, 129, ierrflag);     iPar++;
     LArMinuit->mnparm(iPar, "sigma1", 1, 0.01, 0.5, 2, ierrflag);    iPar++;
     LArMinuit->mnparm(iPar, "A2", 0.4, 0.01, 0., 1., ierrflag);      iPar++;
@@ -95,6 +97,14 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     
     if(LArTrans::getdepolarization() == 0)
         LArMinuit->FixParameter(3);
+
+    if(LArTrans::getfixratio() == 1)
+        LArMinuit->FixParameter(4);  // fixed peak ratio;
+
+    if (usePull == 0) {
+        LArMinuit->FixParameter(10);
+        LArMinuit->FixParameter(11);
+    }
 
     // use values from Zhou's note
     //LArMinuit->FixParameter(0);

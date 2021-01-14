@@ -28,6 +28,8 @@ class LArChiFunction
         TMinuit* LArMinuit;
     
     private:
+        static int usePull;
+
         static double m_chi2;
         static double m_chi2Min;
         static bool   m_DoFit;

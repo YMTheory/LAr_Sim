@@ -37,9 +37,10 @@ class LArTrans
         static void setnuf(double nu_f)      {m_nuf = nu_f;}
         static double getnuf()               {return m_nuf;}
         static int getdepolarization()       {return depolarization;}
+        static int getfixratio()             {return fixratio;}
         static void SetParameters();
 
-        static double CalcRayLength(double wl) {return fRayLength->Eval(wl);}
+        static double CalcRayLength(double wl) {return fRayLength->Eval(wl)*(1+m_nuf);}
 
     private:
         static TGraphErrors* gData;
@@ -51,6 +52,8 @@ class LArTrans
 
     private:
         static int depolarization;
+        static int fixratio;
+
         static double m_delta;
         static double m_A1;
         static double m_mu1;

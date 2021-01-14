@@ -1,4 +1,5 @@
 #include "LArTrans.hh"
+#include "LArConfiguration.hh"
 
 #include <iostream>
 #include <fstream>
@@ -50,13 +51,13 @@ double gRayLength_delta(double* x, double* p)
 double gAbs(Double_t* x, Double_t* p)
 {
     Double_t l = x[0]*1000;
-    Double_t A1 = p[0];
+    //Double_t A1 = p[0];
     Double_t mu1 = p[1];
     Double_t sigma1 = p[2];
     Double_t A2 = p[3];
     Double_t mu2 = p[4];
     Double_t sigma2 = p[5];
-    //Double_t A1 = A2 * p[0]; // p0 is the peak amp ratio;
+    Double_t A1 = A2 * p[0]; // p0 is the peak amp ratio;
 
     Double_t A_abs = A1*TMath::Exp(-(l-mu1)*(l-mu1)/2/sigma1/sigma1) + A2*TMath::Exp(-(l-mu2)*(l-mu2)/2/sigma2/sigma2);
     Double_t T_abs = TMath::Exp( -A_abs*TMath::Log(10.) );
@@ -90,7 +91,8 @@ double LArTrans::m_sigma1;
 double LArTrans::m_A2;
 double LArTrans::m_mu2;
 double LArTrans::m_sigma2;
-int LArTrans::depolarization = 1;
+int LArTrans::depolarization = LArConfiguration::use_depolarization;
+int LArTrans::fixratio = LArConfiguration::fix_absratio;
 
 double LArTrans::sigma_R = 0.04;
 double LArTrans::sigma_f = 1;
@@ -116,6 +118,10 @@ void LArTrans::Initialize()
     else if (depolarization==1) {
         fRayLength = new TF1("fRayLength", gRayLength_delta, 0.11, 0.15, 2);
         cout << "+++++++++++++++++++++++ Did consider depolarization" << endl;
+    }
+
+    if (fixratio) {
+        cout << "+++++++++++++++++++++++ fix absorption ratio" << endl;
     }
 
     fAbs = new TF1("fAbs", gAbs, 0.11, 0.15, 6);
@@ -207,8 +213,6 @@ void LArTrans::Plot()
         Double_t trans_pred = T_Ray * T_abs * corr;
         pred_graph->SetPoint(i, wl, trans_pred);
 
-        if (i == 128)
-            cout << "Rayleigh scattering length @128nm : " << rayL << endl;
     }
     pred_graph->SetLineColor(kGreen+1);
     pred_graph->SetLineWidth(3);
@@ -225,7 +229,7 @@ void LArTrans::Plot()
     //gTransData->GetYaxis()->SetRangeUser(1.2, 1.45);
     gData->Draw("AP");
     pred_graph->Draw("L SAME");
-    cg->SaveAs("TransBa_fixed_nodelta.pdf");
+    cg->SaveAs("Trans.pdf");
 }
 
 
