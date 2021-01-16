@@ -42,11 +42,31 @@ double gRindex20(double *x, double *p) {
 
 }
 
+double gRindex_scale(double* x, double* p)
+{
+    double A = 1.2055e-2*2/3.;
+    double l1 = 91.012;
+    double l2 = 89.892;
+    double l3 = 214.02;
+    //double c = 4.333;
+    double l = x[0];
+    double a = p[0];
+    double b = p[1];
+    double c = p[2];
+    double rho_ratio = p[3];
+
+    double n = TMath::Sqrt((3/(1-(A*rho_ratio*(a/(l1-1/l/l)+b/(l2-1/l/l)+c/(l3-1/l/l)))))-2);
+    return n;
+    
+}
+
+
 int LArRindex::option = LArConfiguration::rindex_model;
 double LArRindex::m_p0 = 0.335;
 double LArRindex::m_p1 = 0.099;
 double LArRindex::m_p2 = 0.008;
 double LArRindex::m_nulambda = 0;
+double LArRindex::m_rhoratio = 1000;
 double LArRindex::sigma_lambda = 0.01;
 TGraphErrors* LArRindex::gData = new TGraphErrors();
 TGraphErrors* LArRindex::gCalc = new TGraphErrors();
@@ -60,30 +80,34 @@ LArRindex::~LArRindex()
 {;}
 
 double LArRindex::CalcRindex(double wl) {
-    if (wl == 0.128)
-        return fRindex->Eval(wl) * (1+m_nulambda);
-    else
-        return fRindex->Eval(wl);
+    //if (wl == 0.128)
+    //    return fRindex->Eval(wl) * (1+m_nulambda);
+    //else
+    //    return fRindex->Eval(wl);
+    return fRindex->Eval(wl);
 }
 
 void LArRindex::Initialize()
 {
     if (option==1) {
-        fRindex = new TF1("fRindex", gRindex, 0.1, 0.7, 3);
-        cout << "==========> We use Our Model" << endl;
+        fRindex = new TF1("fRindex", gRindex, 0.1, 0.7, 4);
+        cout << "==========> We use LL formula" << endl;
     }
     else if (option==0) {
-        fRindex = new TF1("fRindex", gRindex20, 0.1, 0.7, 3);
+        fRindex = new TF1("fRindex", gRindex20, 0.1, 0.7, 4);
         cout << "==========> We use Babicz's Model" << endl;
     }
-
+    else if (option==2) {
+        fRindex = new TF1("fRindex", gRindex_scale, 0.1, 0.7, 4);
+        cout << "==========> We use LL formula scaling." << endl;
+    }
     LoadData();
 
 }
 
 void LArRindex::SetParameters()
 {
-    fRindex->SetParameters(m_p0, m_p1, m_p2);
+    fRindex->SetParameters(m_p0, m_p1, m_p2, m_rhoratio);
 }
 
 double LArRindex::GetChi2()
@@ -145,6 +169,21 @@ double LArRindex::GetChi2()
         chi2 += (m_nulambda/sigma_lambda) * (m_nulambda/sigma_lambda);   // systematic part
     }
 
+    else if (option==2) {
+        // delta chi2 at 128 for Zhou
+        Double_t dndl = -0.005356*m_rhoratio / ( TMath::Sqrt(-2+3/(1-0.0002948*m_rhoratio)) * (1-0.000294811*m_rhoratio)*(1-0.000294811*m_rhoratio) );
+        Double_t dataY = 2.238 + dndl*0.128;
+        Double_t predY = fRindex->Eval(0.128);
+        predY *= (1 + m_nulambda);   // nuisance parameter for resonance peak wavelength
+
+        Double_t dataE = 0.03*0.3;
+
+        chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;
+
+        chi2 += (m_nulambda/sigma_lambda) * (m_nulambda/sigma_lambda);   // systematic part
+    }
+
+
     return chi2;
 }
 
@@ -182,6 +221,7 @@ void LArRindex::Calculate()
 void LArRindex::Plot()
 {
 
+    SetParameters();
     gData128nm->SetPoint(0, 0.128, fRindex->Eval(0.128));
     gData128nm->SetPointError(0, 0, 0.03*0.3);
 

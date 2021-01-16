@@ -109,13 +109,13 @@ def raylength(wl, delta, n):
 if __name__=='__main__':
    
     
-    best, sigma1, sigma5 = load_graph("/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/coutour_Ba.root")
+    best, sigma1, sigma5 = load_graph("/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/contour_model1.root")
     bestx, besty = graph_data(best)
     sigma1x, sigma1y = graph_data(sigma1)
     sigma5x, sigma5y = graph_data(sigma5)
 
 
-    best_our, sigma1_our, sigma5_our = load_graph("/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/coutour_Our.root")
+    best_our, sigma1_our, sigma5_our = load_graph("/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/contour_model2.root")
     bestx_our, besty_our = graph_data(best_our)
     sigma1x_our, sigma1y_our = graph_data(sigma1_our)
     sigma5x_our, sigma5y_our = graph_data(sigma5_our)
@@ -140,13 +140,13 @@ if __name__=='__main__':
         yy1.append( axes1[0]*np.cos(ang)*np.sin(phi1)+axes1[1]*np.sin(ang)*np.cos(phi1)+center1[1]  )
         zz1.append(raylength(0.128, yy1[-1], rindex_ba(0.128)))
 
-    #plt.plot(bestx, besty, "*", ms=8, color='seagreen', label="best fit(Model 1)")
+    plt.plot(bestx, besty, "*", ms=8, color='seagreen', label="best fit(Model 1)")
     #plt.plot(x1, y1, "o", ms=4, color='green')
-    #plt.plot(xx1, yy1, "-", color='lightseagreen', label='1sigma(Model 1)')
-    print("Model1 delta = %.3f, rindex@128nm = %.3f, raylength@128nm = %.3f cm" %(besty, rindex_ba(0.128), raylength(0.128, besty, rindex_ba(0.128))) )
-    bestz = raylength(0.128, besty, rindex_ba(0.128))
-    plt.plot(bestx, bestz, "*", ms=8, color='seagreen', label="best fit(Model 1)")
-    plt.plot(xx1, zz1, "-", color='lightseagreen', label='1sigma(Model 1)')
+    plt.plot(xx1, yy1, "-", color='lightseagreen', label='1sigma allowed region (Model 1)')
+    #print("Model1 delta = %.3f, rindex@128nm = %.3f, raylength@128nm = %.3f cm" %(besty, rindex_ba(0.128), raylength(0.128, besty, rindex_ba(0.128))) )
+    #bestz = raylength(0.128, besty, rindex_ba(0.128))
+    #plt.plot(bestx, bestz, "*", ms=8, color='seagreen', label="best fit(Model 1)")
+    #plt.plot(xx1, zz1, "-", color='lightseagreen', label='1sigma allowed region(Model 1)')
 
 
     # Model 2
@@ -168,20 +168,23 @@ if __name__=='__main__':
         yy2.append( axes2[0]*np.cos(ang)*np.sin(phi2)+axes2[1]*np.sin(ang)*np.cos(phi2)+center2[1]  )
         zz2.append(raylength(0.128, yy2[-1], rindex_our(0.128)))
 
-    #plt.plot(bestx_our, besty_our, "*", ms=8, color='darkviolet', label="best fit(Model 2)")
+    plt.plot(bestx_our, besty_our, "*", ms=8, color='darkviolet', label="best fit(Model 2)")
     #plt.plot(x2, y2, "o", ms=4, color='purple')
-    #plt.plot(xx2, yy2, "-", color='mediumorchid', label='1sigma(Model 2)')
-    bestz_our = raylength(0.128, besty_our, rindex_our(0.128))
-    print("Model2 delte = %.3f, rindex@128nm = %.3f, raylength@128nm = %.3f cm" %(besty_our, rindex_our(0.128), raylength(0.128, besty_our, rindex_our(0.128))) )
-    plt.plot(bestx_our, bestz_our, "*", ms=8, color='darkviolet', label="best fit(Model 2)")
-    plt.plot(xx2, zz2, "-", color='mediumorchid', label='1sigma(Model 2)')
+    plt.plot(xx2, yy2, "-", color='mediumorchid', label='1sigma allowed region (Model 2)')
+    #bestz_our = raylength(0.128, besty_our, rindex_our(0.128))
+    #print("Model2 delte = %.3f, rindex@128nm = %.3f, raylength@128nm = %.3f cm" %(besty_our, rindex_our(0.128), raylength(0.128, besty_our, rindex_our(0.128))) )
+    #plt.plot(bestx_our, bestz_our, "*", ms=8, color='darkviolet', label="best fit(Model 2)")
+    #plt.plot(xx2, zz2, "-", color='mediumorchid', label='1sigma allowed region(Model 2)')
 
 
     plt.xlim(0.92, 0.96)
-    plt.ylim(50, 70)
-    #plt.ylim(0.1, 0.30)
+    #plt.ylim(50, 70)
+    plt.ylim(0.1, 0.30)
     plt.xlabel('Xe absorption ratio')
-    #plt.ylabel(r"$\delta$")
-    plt.ylabel(r"$L_{Ray}/cm$")
+    plt.ylabel(r"$\delta$")
+    #plt.ylabel(r"$L_{Ray}/cm$")
     plt.legend()
+    plt.grid(True)
+
+    plt.savefig("profile2d_delta.pdf")
     plt.show()

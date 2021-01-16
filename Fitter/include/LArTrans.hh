@@ -40,7 +40,7 @@ class LArTrans
         static int getfixratio()             {return fixratio;}
         static void SetParameters();
 
-        static double CalcRayLength(double wl) {return fRayLength->Eval(wl)*(1+m_nuf);}
+        static double CalcRayLength(double wl) {return fRayLength->Eval(wl);}
 
     private:
         static TGraphErrors* gData;

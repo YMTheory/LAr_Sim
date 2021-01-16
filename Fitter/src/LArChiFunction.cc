@@ -1,4 +1,6 @@
 #include "LArChiFunction.hh"
+#include "LArConfiguration.hh"
+
 #include <TAxis.h>
 #include <TCanvas.h>
 #include <TMath.h>
@@ -6,12 +8,12 @@
 
 using namespace std;
 
-int LArChiFunction::usePull = 1;
+int LArChiFunction::usePull = LArConfiguration::use_pullterm;
 
 double LArChiFunction::m_chi2;
 double LArChiFunction::m_chi2Min;
 bool LArChiFunction::m_DoFit;
-int LArChiFunction::m_nParameters = 12;
+int LArChiFunction::m_nParameters = 13;
 double LArChiFunction::m_bestFit[20];
 double LArChiFunction::m_fitError[20];
 
@@ -48,6 +50,7 @@ void LArChiFunction::SetParameters(double *par)
     LArRindex::setp0(par[0]);
     LArRindex::setp1(par[1]);
     LArRindex::setp2(par[2]);
+    LArRindex::setrhoratio(par[12]);
 
     LArTrans::setdelta(par[3]);
     LArTrans::setA1(par[4]);
@@ -75,9 +78,9 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     int iPar = 0;
     LArMinuit->mnexcm("CLEAR", arglist, 0, ierrflag);
 
-    if(LArRindex::getoption() ==1) {
-        LArMinuit->mnparm(iPar, "p0", 0.207, 0.01, 0., 1., ierrflag);     iPar++;
-        LArMinuit->mnparm(iPar, "p1", 0.0415, 0.001, 0., 1., ierrflag);     iPar++;
+    if(LArRindex::getoption() ==1 or LArRindex::getoption()==2 ) {
+        LArMinuit->mnparm(iPar, "p0", 0.2075, 0.01, 0.1, 0.3, ierrflag);     iPar++;
+        LArMinuit->mnparm(iPar, "p1", 0.0415, 0.001, 0.01, 0.1, ierrflag);     iPar++;
         LArMinuit->mnparm(iPar, "p2", 4.333, 0.001, 0., 5., ierrflag);    iPar++;
     } else if (LArRindex::getoption() == 0) {
         LArMinuit->mnparm(iPar, "p0", 0.335, 0.001, 0., 1., ierrflag);     iPar++;
@@ -85,7 +88,7 @@ double LArChiFunction::GetChiSquare(double maxChi2)
         LArMinuit->mnparm(iPar, "p2", 0.008, 0.001, 0., 1., ierrflag);    iPar++;
     }
     LArMinuit->mnparm(iPar, "delta", 0.0, 0.01, 0., 1., ierrflag);   iPar++;
-    LArMinuit->mnparm(iPar, "ratio", 0.947, 0.001, 0.90, 1.0, ierrflag);      iPar++;
+    LArMinuit->mnparm(iPar, "peakratio", 0.947, 0.001, 0.90, 1.0, ierrflag);      iPar++;
     //LArMinuit->mnparm(iPar, "A1", 0.3, 0.01, 0., 0., ierrflag);      iPar++;
     LArMinuit->mnparm(iPar, "mu1",126, 0.1, 123, 129, ierrflag);     iPar++;
     LArMinuit->mnparm(iPar, "sigma1", 1, 0.01, 0.5, 2, ierrflag);    iPar++;
@@ -94,7 +97,14 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     LArMinuit->mnparm(iPar, "sigma2", 1.5, 0.01, 0.5, 2, ierrflag);  iPar++;
     LArMinuit->mnparm(iPar, "nu_lambda", 0, 0.01, 0, 1, ierrflag);   iPar++;
     LArMinuit->mnparm(iPar, "nu_f", 0, 0.01, 0, 1, ierrflag);   iPar++;
+    LArMinuit->mnparm(iPar, "rhoratio", 34.49/(44.66e-3), 1, 200, 1200, ierrflag); iPar++;
     
+    if(LArRindex::getoption() == 2) {
+        LArMinuit->FixParameter(0);
+        LArMinuit->FixParameter(1);
+        LArMinuit->FixParameter(2);
+    }
+
     if(LArTrans::getdepolarization() == 0)
         LArMinuit->FixParameter(3);
 
@@ -136,7 +146,7 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     cout << "    minChi2: " << min << endl;
     cout << " ====================== " << endl;
 
-    cout << "=======> 128nm refractive index = " << LArRindex::CalcRindex(0.128) << endl;
+    cout << "=======> 28nm refractive index = " << LArRindex::CalcRindex(0.128)*(1+LArRindex::getnulambda()) << endl;
     LArTrans::setrindex(LArRindex::CalcRindex(0.128));
     cout << "=======> 128nm Rayleigh scattering length = " << LArTrans::CalcRayLength(0.128) << endl;
 
