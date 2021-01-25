@@ -24,8 +24,6 @@ class LArRindex
         static double getp2()        {return m_p2;}
         static void setrhoratio(double rhoratio) {m_rhoratio = rhoratio;}
         static double getrhoratio()  {return m_rhoratio;}
-        static void setnulambda(double nulambda) {m_nulambda = nulambda;}
-        static double getnulambda()  {return m_nulambda;}
         static int getoption()       {return option;}
         static void SetParameters();
 
@@ -47,9 +45,10 @@ class LArRindex
         static double m_p1;
         static double m_p2;
         static double m_rhoratio;
-        static double m_nulambda;
-        static double sigma_lambda;
         
+    private:
+        static double gRindex128();
+        static double gRindex128_20();
 
 };
 

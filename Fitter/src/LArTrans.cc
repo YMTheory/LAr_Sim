@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "TCanvas.h"
+#include "TLegend.h"
 
 using namespace std;
 
@@ -33,7 +34,8 @@ double gRayLength_delta(double* x, double* p)
     double rindex = p[0];  // rindex
     double delta = p[1];   // depolarization
 
-    double kT = 2.24442E-9;
+    double kT = 2.25282E-9;
+    //double kT = 2.24442E-9;
     double kB = 1.380649E-23;
     double T = 90; // K
     double f = 1e22;
@@ -42,6 +44,7 @@ double gRayLength_delta(double* x, double* p)
 
     double rayL = 1 / (8*TMath::Power(pi, 3)/3/TMath::Power(l, 4)
                 * ((rindex*rindex-1)*(rindex*rindex+2)/3)*((rindex*rindex-1)*(rindex*rindex+2)/3) * kT * kB * T * f * (6+3*delta)/(6-7*delta));
+    //cout << rindex << " " << delta << " " << rayL << endl;
 
     return rayL;
 
@@ -137,6 +140,7 @@ void LArTrans::LoadData()
 {
     cout << "+++++++++++++++++++ Load Transmission Data ..." << endl;
     ifstream in; in.open("./data/G140ppb.txt");
+    //ifstream in; in.open("./data/data2012.txt");
     string line;
     double m_wl, m_tran, m_tran_err;
     Int_t idx = 0;
@@ -201,6 +205,14 @@ void LArTrans::Calculate()
 void LArTrans::Plot()
 {
     TGraph* pred_graph = new TGraph();
+    TGraph* abs_graph  = new TGraph();
+    TGraph* ray_graph  = new TGraph();
+    TGraphErrors* data_graph = new TGraphErrors();
+    for(Int_t i=0; i<gData->GetN(); i++) {
+        Double_t corr = fCorr->Eval(gData->GetPointX(i));
+        data_graph->SetPoint(i, gData->GetPointX(i), gData->GetPointY(i)/corr);
+        data_graph->SetPointError(i, 0, gData->GetEY()[i]);
+    }
     for (Int_t i=0; i<1000; i++) {
         Double_t wl = ((150.-125.)/1000*i + 125. )/1000.;
         Double_t rindex = LArRindex::CalcRindex(wl);
@@ -210,25 +222,39 @@ void LArTrans::Plot()
         Double_t rayL = fRayLength->Eval(wl);
         Double_t T_abs = fAbs->Eval(wl);
         Double_t T_Ray = TMath::Exp(-5.8/(rayL)) ;
-        Double_t trans_pred = T_Ray * T_abs * corr;
+        Double_t trans_pred = T_Ray * T_abs;
         pred_graph->SetPoint(i, wl, trans_pred);
-
+        abs_graph->SetPoint(i, wl, T_abs);
+        ray_graph->SetPoint(i, wl, T_Ray);
     }
     pred_graph->SetLineColor(kGreen+1);
     pred_graph->SetLineWidth(3);
+    abs_graph->SetLineColor(kOrange+1);
+    abs_graph->SetLineWidth(3);
+    ray_graph->SetLineColor(kViolet+1);
+    ray_graph->SetLineWidth(3);
 
-    gData->SetMarkerColor(kBlue+1);
-    gData->SetLineColor(kBlue+1);
-    gData->SetMarkerSize(0.5);
-    gData->SetMarkerStyle(20);
-    gData->SetLineWidth(2);
+    data_graph->SetMarkerColor(kBlue+1);
+    data_graph->SetLineColor(kBlue+1);
+    data_graph->SetMarkerSize(0.5);
+    data_graph->SetMarkerStyle(20);
+    data_graph->SetLineWidth(2);
 
     TCanvas* cg = new TCanvas("cg", "", 800, 600);
-    gData->SetTitle("Transmission; wavelength/um; transmission");
+    data_graph->SetTitle("Transmission; wavelength/um; transmission");
     //gTransData->GetXaxis()->SetLimits(0.11, 0.7);
     //gTransData->GetYaxis()->SetRangeUser(1.2, 1.45);
-    gData->Draw("AP");
+    data_graph->Draw("AP");
     pred_graph->Draw("L SAME");
+    ray_graph->Draw("L SAME");
+    abs_graph->Draw("L SAME");
+
+    TLegend* ll = new TLegend();
+    ll->AddEntry(pred_graph, "Transmission");
+    ll->AddEntry(abs_graph, "absorption");
+    ll->AddEntry(ray_graph, "rayleigh");
+    ll->Draw("SAME");
+
     cg->SaveAs("Trans.pdf");
 }
 

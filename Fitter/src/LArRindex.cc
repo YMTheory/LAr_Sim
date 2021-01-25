@@ -57,7 +57,37 @@ double gRindex_scale(double* x, double* p)
 
     double n = TMath::Sqrt((3/(1-(A*rho_ratio*(a/(l1-1/l/l)+b/(l2-1/l/l)+c/(l3-1/l/l)))))-2);
     return n;
-    
+
+}
+
+double LArRindex::gRindex128()
+{
+    Double_t a0  = m_p0;
+    Double_t aUV = m_p1;
+    Double_t aIR = m_p2;
+
+    Double_t part1 = -3*(0.323001*aIR + 115.417*aUV)*(a0 - 0.0202616*aIR + 3.26346*aUV)/(3 -a0+ 0.0202616*aIR - 3.26346*aUV)/(3 -a0+ 0.0202616*aIR - 3.26346*aUV);
+    Double_t part2 = 3*(-0.323001*aIR - 115.417*aUV)/(3-a0 +0.0202616*aIR-3.26346*aUV);
+    Double_t part3 = 2*TMath::Sqrt(1+(3*(a0-0.0202616*aIR+3.26346*aUV))/(3-a0+0.0202616*aIR-3.26346*aUV));
+    Double_t dndl = (part1+part2)/part3;
+    Double_t dataY = 2.23645 + dndl * 0.128;
+
+    return dataY;
+}
+
+double LArRindex::gRindex128_20()
+{
+    Double_t fa = m_p0;
+    Double_t fb = m_p1;
+    Double_t fc = m_p2;
+
+    Double_t part1 = 9.57976*(-1.06128*fa - 1.14526*fb - 0.0407477*fc);
+    Double_t part2 = TMath::Sqrt(-2+(3/(1-6.3865*(0.0333591*fa + 0.0346538*fb + 0.0065366*fc))));
+    Double_t part3 = (1 - 6.3865*(0.0333591*fa + 0.0346538*fb + 0.0065366*fc)) * (1 - 6.3865*(0.0333591*fa + 0.0346538*fb + 0.0065366*fc) );
+    Double_t dndl = part1/(part2*part3);
+    Double_t dataY = 2.238 + dndl*0.128;
+
+    return dataY;
 }
 
 
@@ -65,9 +95,7 @@ int LArRindex::option = LArConfiguration::rindex_model;
 double LArRindex::m_p0 = 0.335;
 double LArRindex::m_p1 = 0.099;
 double LArRindex::m_p2 = 0.008;
-double LArRindex::m_nulambda = 0;
 double LArRindex::m_rhoratio = 1000;
-double LArRindex::sigma_lambda = 0.01;
 TGraphErrors* LArRindex::gData = new TGraphErrors();
 TGraphErrors* LArRindex::gCalc = new TGraphErrors();
 TGraphErrors* LArRindex::gData128nm = new TGraphErrors();
@@ -80,10 +108,6 @@ LArRindex::~LArRindex()
 {;}
 
 double LArRindex::CalcRindex(double wl) {
-    //if (wl == 0.128)
-    //    return fRindex->Eval(wl) * (1+m_nulambda);
-    //else
-    //    return fRindex->Eval(wl);
     return fRindex->Eval(wl);
 }
 
@@ -112,7 +136,7 @@ void LArRindex::SetParameters()
 
 double LArRindex::GetChi2()
 {
-    Calculate();
+    Calculate();  // only 350-650nm range data 
 
     double chi2 = 0;
 
@@ -127,62 +151,6 @@ double LArRindex::GetChi2()
         double e = datae[i];
         chi2 += (pred-y) * (pred-y) / e / e;
     }
-
-    //128nm group velocity
-    if (option == 0) {
-
-        // delta chi2 at 128 nm for Babicz
-        Double_t a0  = fRindex->GetParameter(0);
-        Double_t aUV = fRindex->GetParameter(1);
-        Double_t aIR = fRindex->GetParameter(2);
-        Double_t part1 = -3*(0.323001*aIR + 115.417*aUV)*(a0 - 0.0202616*aIR + 3.26346*aUV)/(3 -a0+ 0.0202616*aIR - 3.26346*aUV)/(3 -a0+ 0.0202616*aIR - 3.26346*aUV);
-        Double_t part2 = 3*(-0.323001*aIR - 115.417*aUV)/(3-a0 +0.0202616*aIR-3.26346*aUV);
-        Double_t part3 = 2*TMath::Sqrt(1+(3*(a0-0.0202616*aIR+3.26346*aUV))/(3-a0+0.0202616*aIR-3.26346*aUV));
-        Double_t dndl = (part1+part2)/part3;
-        Double_t dataY = 2.238 + dndl * 0.128;
-        Double_t predY = fRindex->Eval(0.128);
-        predY *= (1 + m_nulambda);   // nuisance parameter for resonance peak wavelength
-
-        Double_t dataE = 0.03*0.3;
-
-        chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;  // statistic part
-
-        chi2 += (m_nulambda/sigma_lambda) * (m_nulambda/sigma_lambda);   // systematic part
-    }
-    else if (option==1) {
-        // delta chi2 at 128 for Zhou
-        Double_t fa = fRindex->GetParameter(0);
-        Double_t fb = fRindex->GetParameter(1);
-        Double_t fc = fRindex->GetParameter(2);
-        Double_t part1 = 9.57976*(-1.06128*fa - 1.14526*fb - 0.0407477*fc);
-        Double_t part2 = TMath::Sqrt(-2+(3/(1-6.3865*(0.0333591*fa + 0.0346538*fb + 0.0065366*fc))));
-        Double_t part3 = (1 - 6.3865*(0.0333591*fa + 0.0346538*fb + 0.0065366*fc)) * (1 - 6.3865*(0.0333591*fa + 0.0346538*fb + 0.0065366*fc) );
-        Double_t dndl = part1/(part2*part3);
-        Double_t dataY = 2.238 + dndl*0.128;
-        Double_t predY = fRindex->Eval(0.128);
-        predY *= (1 + m_nulambda);   // nuisance parameter for resonance peak wavelength
-
-        Double_t dataE = 0.03*0.3;
-
-        chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;
-
-        chi2 += (m_nulambda/sigma_lambda) * (m_nulambda/sigma_lambda);   // systematic part
-    }
-
-    else if (option==2) {
-        // delta chi2 at 128 for Zhou
-        Double_t dndl = -0.005356*m_rhoratio / ( TMath::Sqrt(-2+3/(1-0.0002948*m_rhoratio)) * (1-0.000294811*m_rhoratio)*(1-0.000294811*m_rhoratio) );
-        Double_t dataY = 2.238 + dndl*0.128;
-        Double_t predY = fRindex->Eval(0.128);
-        predY *= (1 + m_nulambda);   // nuisance parameter for resonance peak wavelength
-
-        Double_t dataE = 0.03*0.3;
-
-        chi2 += (dataY-predY)*(dataY-predY)/dataE/dataE;
-
-        chi2 += (m_nulambda/sigma_lambda) * (m_nulambda/sigma_lambda);   // systematic part
-    }
-
 
     return chi2;
 }
@@ -222,17 +190,11 @@ void LArRindex::Plot()
 {
 
     SetParameters();
-    gData128nm->SetPoint(0, 0.128, fRindex->Eval(0.128));
-    gData128nm->SetPointError(0, 0, 0.03*0.3);
 
     gData->SetMarkerStyle(20);
     gData->SetMarkerColor(kBlue+1);
     gData->SetLineColor(kBlue+1);
     gData->SetLineWidth(2);
-    gData128nm->SetMarkerStyle(20);
-    gData128nm->SetMarkerColor(kBlue+1);
-    gData128nm->SetLineColor(kBlue+1);
-    gData128nm->SetLineWidth(2);
 
     TGraphErrors* gDraw = new TGraphErrors();
     const Int_t N = 1000;

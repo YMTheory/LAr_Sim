@@ -52,8 +52,9 @@ def raylength(wl, delta, n):
 if __name__=='__main__':
     plt.style.use('seaborn-deep')
 
-    graph1, zone1, line1 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/delta_model1.root')
-    graph2, zone2, line2 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/delta_model2.root')
+    #graph1, zone1, line1 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/delta.root')
+    graph1, zone1, line1 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/delta_5sigma.root')
+    #graph2, zone2, line2 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/delta_model2.root')
 
     scanx1, scany1, scanl1 = [], [], []
     for i in range(graph1.GetN()):
@@ -76,16 +77,24 @@ if __name__=='__main__':
         rindex = rindex_ba(0.128)
         linel1.append(raylength(0.128, linex1[-1], rindex))
 
-    #plt.plot(scanx1, scany1, "-", color='royalblue')
-    #plt.plot(linex1, liney1, "--", color='blue', label="best fit(Model 1)")
-    #plt.fill_between([zonex1[0], zonex1[-1]], [0, 0], [zoney1[1], zoney1[1]], alpha=0.2, color='royalblue', label="5sigma C.I.(Model 1)")
-    plt.plot(scanl1, scany1, '-', color='royalblue')
-    plt.plot(linel1, liney1, "--", color='blue', label="best fit(Model 1)")
-    plt.fill_between([zonel1[0], zonel1[-1]], [0, 0], [zoney1[1], zoney1[1]], alpha=0.2, color='royalblue', label="5sigma C.I.(Model 1)")
+    fig = plt.figure(figsize=(6, 4))
+    figr = fig.add_subplot(111)
+
+    plt.plot(scanx1, scany1, "-", color='royalblue')
+    plt.plot(linex1, liney1, "--", color='blue', label="best fit(Model 1)")
+    plt.fill_between([zonex1[0], zonex1[-1]], [0, 0], [zoney1[1], zoney1[1]], alpha=0.2, color='purple', label="5sigma C.I.(Model 1)")
+
+    #plt.hlines(25, 0, 0.5, color='magenta', linestyles="-.")
+    #plt.text(0.04, 60, r"$5 \sigma$ C.I.")
+    #plt.hlines(25, 0.9, 1.0, color='magenta', linestyles="-.")
+    #plt.text(0.91, 30, r"$5 \sigma$ C.I.")
+    #plt.plot(scanl1, scany1, '-', color='royalblue')
+    #plt.plot(linel1, liney1, "--", color='blue', label="best fit(Model 1)")
+    #plt.fill_between([zonel1[0], zonel1[-1]], [0, 0], [zoney1[1], zoney1[1]], alpha=0.2, color='royalblue', label="5sigma C.I.(Model 1)")
     plt.ylim(0, liney1[-1])
 
 
-
+    """
     scanx2, scany2, scanl2 = [], [], []
     for i in range(graph2.GetN()):
         scanx2.append(graph2.GetPointX(i))
@@ -113,14 +122,21 @@ if __name__=='__main__':
     plt.plot(scanl2, scany2, "-", color='forestgreen')
     plt.plot(linel2, liney2, "--", color='green', label="best fit (Model 2)")
     plt.fill_between([zonel2[0], zonel2[-1]], [0, 0], [zoney2[1], zoney2[1]], alpha=0.2, color='forestgreen', label="5sigma C.I.(Model 2)")
+    """
 
-    plt.legend()
-    #plt.xlim(0, 0.4)
-    plt.ylim(0, 400)
+    plt.legend(loc='upper left')
+    #plt.xlim(0.92, 0.96)
+    plt.xlim(0.0, 0.50)
+    #plt.ylim(0, 20)
+    #plt.xlim(126.45, 126.57)
+    #plt.xlim(140.07, 140.17)
 
-    plt.xlabel(r"$L_{Ray}/cm$")
-    #plt.xlabel(r"$\delta$")
+    plt.xlabel(r"$\delta$")
+    #plt.xlabel("Xe absorption peak ratio")
     plt.ylabel(r"$\Delta \chi^2$")
+    plt.grid(True)
+    #figr.axes.get_xaxis().set_visible(False)
+    #plt.xticks([])
 
-    plt.savefig("profile_LRay.pdf")
+    plt.savefig("profile_delta_0zone_model1.pdf")
     plt.show()
