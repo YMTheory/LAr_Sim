@@ -4,6 +4,7 @@
 #include "LArRindex.hh"
 #include "LArTrans.hh"
 #include "LArGroupVelocity.hh"
+#include "LArConfiguration.hh"
 
 class LArMathMinimizer
 {
@@ -21,6 +22,10 @@ class LArMathMinimizer
 
         static int Minimization();
 
+        static bool Plot();
+
+    private:
+        static bool m_fit_purified;
 };
 
 #endif
