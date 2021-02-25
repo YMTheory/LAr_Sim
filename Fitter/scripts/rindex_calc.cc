@@ -23,7 +23,7 @@ double rindex_ba(double *par)
     double a0  = par[0];
     double aUV = par[1];
     double aIR = par[2];
-    double l = 0.128;
+    double l = par[3];
     double lUV = 0.1066;
     double lIR = 0.9083;
 
@@ -48,19 +48,19 @@ double raylength(double l, double rindex, double delta)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 6) {
+    if (argc != 7) {
         cout << "Not Correct Parameter Number !" << endl;
         return 0;
     }
 
-    double par[3] = {atof(argv[2]), atof(argv[3]), atof(argv[4]) };
+    double par[4] = {atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[6]) };
     double rindex;
     if (atoi(argv[1]) == 1) {
         cout << "rindex @128nm is " << rindex_our(par) << endl; rindex = rindex_our(par);
     } else if (atoi(argv[1]) == 0) {
         cout << "rindex @128nm is " << rindex_ba(par) << endl; rindex = rindex_ba(par); }
 
-    cout << "raylength @128nm is " << raylength(0.128, rindex, atof(argv[5])) << endl;
+    cout << "raylength @128nm is " << raylength(atof(argv[6]), rindex, atof(argv[5])) << endl;
 
     return 1;
 }
