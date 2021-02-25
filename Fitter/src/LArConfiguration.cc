@@ -10,3 +10,5 @@ int LArConfig::fix_absratio = 0;
 double LArConfig::factor1 = 0.;
 double LArConfig::factor2 = 0.;
 double LArConfig::factor3 = 0.;
+
+bool LArConfig::fit_purified = true;

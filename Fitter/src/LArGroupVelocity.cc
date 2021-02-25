@@ -17,7 +17,7 @@ LArGroupVelocity::~LArGroupVelocity()
 void LArGroupVelocity::Initialize()
 {
     setdata(7.46);      // group velocity 
-    setdataerr(0.03);   // group velocity error
+    setdataerr(0.273);   // group velocity error
 }
 
 void LArGroupVelocity::Calculate()

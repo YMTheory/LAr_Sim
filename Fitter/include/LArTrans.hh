@@ -38,6 +38,8 @@ class LArTrans
         static double getnuf()               {return m_nuf;}
         static int getdepolarization()       {return depolarization;}
         static int getfixratio()             {return fixratio;}
+        static double getscale()             {return m_scale;}
+        static void setscale(double scale)   {m_scale = scale;}
         static void SetParameters();
 
         static double CalcRayLength(double wl) {return fRayLength->Eval(wl);}
@@ -53,6 +55,7 @@ class LArTrans
     private:
         static int depolarization;
         static int fixratio;
+        static bool m_fit_purified;
 
         static double m_delta;
         static double m_A1;
@@ -66,6 +69,8 @@ class LArTrans
         static double sigma_R;
         static double m_nuf;
         static double sigma_f;
+
+        static double m_scale;
 
 };
 

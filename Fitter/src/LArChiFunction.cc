@@ -18,6 +18,8 @@ double LArChiFunction::m_bestFit[20];
 double LArChiFunction::m_fitError[20];
 double LArChiFunction::m_ratio;
 
+bool LArChiFunction::m_fit_purified = LArConfiguration::fit_purified;
+
 // Lagrange Multipliers
 double LArChiFunction::m_factor1 = LArConfiguration::factor1;
 double LArChiFunction::m_factor2 = LArConfiguration::factor2;
@@ -82,6 +84,8 @@ void LArChiFunction::SetParameters(double *par)
     //LArRindex::setnulambda(par[10]);
     LArTrans::setnuf(par[10]);
 
+    // scale only for purified spectra:
+    LArTrans::setscale(par[11]);
     // Lagrange Multipliers:
     m_ratio = par[4];
 }
@@ -112,14 +116,16 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     LArMinuit->mnparm(iPar, "delta", 0.0, 0.01, 0., 1., ierrflag);   iPar++;
     LArMinuit->mnparm(iPar, "peakratio", 0.947, 0.001, 0.90, 1.0, ierrflag);      iPar++;
     //LArMinuit->mnparm(iPar, "A1", 0.3, 0.01, 0., 0., ierrflag);      iPar++;
-    LArMinuit->mnparm(iPar, "mu1",126, 0.1, 123, 129, ierrflag);     iPar++;
+    LArMinuit->mnparm(iPar, "mu1",126.51, 0.1, 123, 129, ierrflag);     iPar++;
     LArMinuit->mnparm(iPar, "sigma1", 1, 0.01, 0.5, 2, ierrflag);    iPar++;
     LArMinuit->mnparm(iPar, "A2", 0.4, 0.01, 0., 1., ierrflag);      iPar++;
-    LArMinuit->mnparm(iPar, "mu2",140, 0.1, 135, 145, ierrflag);     iPar++;
-    LArMinuit->mnparm(iPar, "sigma2", 1.5, 0.01, 0.5, 2, ierrflag);  iPar++;
+    LArMinuit->mnparm(iPar, "mu2",140.121, 0.1, 135, 145, ierrflag);     iPar++;
+    LArMinuit->mnparm(iPar, "sigma2", 1.537, 0.01, 0.5, 2, ierrflag);  iPar++;
     //LArMinuit->mnparm(iPar, "nu_lambda", 0, 0.01, -1, 1, ierrflag);   iPar++;
     LArMinuit->mnparm(iPar, "nu_f", 0, 0.01, -1, 1, ierrflag);   iPar++;
     //LArMinuit->mnparm(iPar, "rhoratio", 34.49/(44.66e-3), 1, 200, 1200, ierrflag); iPar++;
+    
+    LArMinuit->mnparm(iPar, "scale", 1, 0.0001, 0.9, 1.1, ierrflag); iPar++;
 
 
     //LArMinuit->mnparm(iPar, "delta", 0.2, 0.01, 0., 1., ierrflag);   iPar++;
@@ -152,6 +158,14 @@ double LArChiFunction::GetChiSquare(double maxChi2)
 
     if (usePull == 0) {
         LArMinuit->FixParameter(10);
+    }
+
+    if (m_fit_purified) {
+        LArMinuit->FixParameter(5);
+        LArMinuit->FixParameter(6);
+        LArMinuit->FixParameter(8);
+        LArMinuit->FixParameter(9);
+    } else {
         LArMinuit->FixParameter(11);
     }
 

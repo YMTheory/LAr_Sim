@@ -10,6 +10,7 @@ class LArConfiguration
         
         static int use_depolarization;
         static int fix_absratio;
+        static bool fit_purified;
 
         // Lagrange multiplier
         static double factor1;  // Xe peak ratio

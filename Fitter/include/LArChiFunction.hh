@@ -49,6 +49,8 @@ class LArChiFunction
 
         static double m_ratio;
 
+        static bool m_fit_purified;
+
 };
 
 #endif

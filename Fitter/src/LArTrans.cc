@@ -94,8 +94,10 @@ double LArTrans::m_sigma1;
 double LArTrans::m_A2;
 double LArTrans::m_mu2;
 double LArTrans::m_sigma2;
+double LArTrans::m_scale;
 int LArTrans::depolarization = LArConfiguration::use_depolarization;
 int LArTrans::fixratio = LArConfiguration::fix_absratio;
+bool LArTrans::m_fit_purified = LArConfiguration::fit_purified;
 
 double LArTrans::sigma_R = 0.04;
 double LArTrans::sigma_f = 1;
@@ -127,6 +129,12 @@ void LArTrans::Initialize()
         cout << "+++++++++++++++++++++++ fix absorption ratio" << endl;
     }
 
+    if (m_fit_purified) {
+        cout << "+++++++++++++++++++++++ fit purified LAr data" << endl;
+    } else {
+        cout << "+++++++++++++++++++++++ fit Xe-doped LAr data" << endl;
+    }
+
     fAbs = new TF1("fAbs", gAbs, 0.11, 0.15, 6);
     fCorr = new TF1("fCorr", gCorr, 0.1, 0.2, 1);
 
@@ -139,8 +147,11 @@ void LArTrans::Initialize()
 void LArTrans::LoadData()
 {
     cout << "+++++++++++++++++++ Load Transmission Data ..." << endl;
-    ifstream in; in.open("./data/G140ppb.txt");
-    //ifstream in; in.open("./data/data2012.txt");
+    ifstream in; 
+    if (m_fit_purified)
+        in.open("./data/data2012.txt");
+    else
+        in.open("./data/G140ppb.txt");
     string line;
     double m_wl, m_tran, m_tran_err;
     Int_t idx = 0;
@@ -194,7 +205,7 @@ void LArTrans::Calculate()
         fCorr->SetParameter(0, rindex);
         double corr = fCorr->Eval(wl);
         double T_abs = fAbs->Eval(wl);
-        double trans_pred = T_Ray * T_abs * corr;
+        double trans_pred = T_Ray * T_abs * corr * m_scale;
         //trans_pred *= (1+nu_R) * (1+nu_f);   // nuisance parameters
         
         gCalc->SetPoint(i, datax[i], trans_pred);
