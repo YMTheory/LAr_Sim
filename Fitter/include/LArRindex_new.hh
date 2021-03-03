@@ -2,6 +2,7 @@
 #define LArRindex_new_h
 
 #include <TGraphErrors.h>
+#include "TF1.h"
 
 class LArRindex_new
 {
@@ -21,6 +22,8 @@ class LArRindex_new
 
         static void SetParameters();    
 
+        static void Plot();
+
     private:
         static double m_rho;
 
@@ -28,6 +31,10 @@ class LArRindex_new
         static TGraphErrors* gData;
         static TGraphErrors* gCalc;
 
+        static TF1* fRindex;
+
 };
+
+extern double gRindex_new(double *x, double *p);
 
 #endif

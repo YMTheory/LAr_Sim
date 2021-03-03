@@ -1,10 +1,34 @@
 #include "LArRindex_new.hh"
 
+#include "TF1.h"
+#include "TMath.h"
+#include "TCanvas.h"
+#include "TAxis.h"
+
 using namespace std;
 
-double LArRindex_new::m_rho = 34;
+
+double gRindex_new(Double_t* x, Double_t* p) 
+{
+    double l = x[0];
+    double lUV = 0.1066;
+    double lIR = 0.9083;
+
+    double a0  = 0.335;
+    double aUV = 0.099; 
+    double aIR = 0.008;
+
+    double rho = p[0];
+
+    double A = a0 + aUV*l*l/(l*l-lUV*lUV) + aIR*l*l/(l*l-lIR*lIR) * rho;
+    double n = TMath::Sqrt(1 + 3*A/(3-A));
+    return n;
+}
+
+double LArRindex_new::m_rho = 1;
 TGraphErrors* LArRindex_new::gData = new TGraphErrors();
 TGraphErrors* LArRindex_new::gCalc = new TGraphErrors();
+TF1* LArRindex_new::fRindex;
 
 LArRindex_new::LArRindex_new()
 {;}
@@ -14,8 +38,8 @@ LArRindex_new::~LArRindex_new()
 
 void LArRindex_new::Initialize()
 {
-    //std::cout << "==========> Rindex Initialization " << std::endl;
 
+    fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 1);
     LoadData();
 }
 
@@ -35,7 +59,67 @@ void LArRindex_new::LoadData()
 }
 
 double LArRindex_new::GetChi2()
-{;}
+{
+    Calculate();
+
+    double chi2 = 0;
+
+    double *datay = gData->GetY();
+    double *datae = gData->GetEY();
+    double *calcy = gCalc->GetY();
+
+    for(int i=0; i<gData->GetN(); i++) {
+        double pred = calcy[i];
+        double y    = datay[i];
+        double e    = datae[i];
+        chi2 += (pred - y) * (pred - y) /e /e;
+    }
+    
+    return chi2;
+}
+
 
 void LArRindex_new::Calculate()
-{;}
+{
+    SetParameters();
+    double *datax = gData->GetX();
+    for(int i=0; i<gData->GetN(); i++) {
+        double calc = fRindex->Eval(datax[i]);
+        gCalc->SetPoint(i, datax[i], calc);
+    }
+}
+
+
+void LArRindex_new::SetParameters()
+{
+    fRindex->SetParameter(0, m_rho);
+}
+
+void LArRindex_new::Plot()
+{
+    SetParameters();
+
+    gData->SetMarkerStyle(20);
+    gData->SetMarkerColor(kBlue+1);
+    gData->SetLineColor(kBlue+1);
+    gData->SetLineWidth(2);
+
+    TGraphErrors* gDraw = new TGraphErrors();
+    const Int_t N = 1000;
+    for(int i=0; i<N; i++) {
+        Double_t tmpx = 0.11+0.6/1000*i;
+        gDraw->SetPoint(i, tmpx, fRindex->Eval(tmpx));     
+    }
+    gDraw->SetLineColor(kGreen+1);
+    gDraw->SetLineWidth(2);
+
+    TCanvas* cc = new TCanvas("cc", "", 800, 600); cc->cd();
+    gData->GetXaxis()->SetLimits(0.11, 0.7);
+    gData->GetYaxis()->SetRangeUser(1.2, 1.45);
+    gData->SetTitle("rindex fitting; wavelength/um; rindex");
+
+    gData->Draw("AP");
+    gDraw->Draw("L SAME");
+
+    cc->SaveAs("rindex-new.root");
+}
