@@ -20,7 +20,7 @@ double gRindex_new(Double_t* x, Double_t* p)
 
     double rho = p[0];
 
-    double A = a0 + aUV*l*l/(l*l-lUV*lUV) + aIR*l*l/(l*l-lIR*lIR) * rho;
+    double A = ( a0 + aUV*l*l/(l*l-lUV*lUV) + aIR*l*l/(l*l-lIR*lIR) ) * rho;
     double n = TMath::Sqrt(1 + 3*A/(3-A));
     return n;
 }
@@ -39,6 +39,7 @@ LArRindex_new::~LArRindex_new()
 void LArRindex_new::Initialize()
 {
 
+    std::cout << "===========> LArRindex_new Initialization" << std::endl;
     fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 1);
     LoadData();
 }

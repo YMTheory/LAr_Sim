@@ -11,4 +11,4 @@ double LArConfig::factor1 = 0.;
 double LArConfig::factor2 = 0.;
 double LArConfig::factor3 = 0.;
 
-bool LArConfig::fit_purified = true;
+bool LArConfig::fit_purified = false;

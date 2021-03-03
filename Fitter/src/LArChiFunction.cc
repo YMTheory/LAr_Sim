@@ -114,7 +114,7 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     }
 
     LArMinuit->mnparm(iPar, "delta", 0.0, 0.01, 0., 1., ierrflag);   iPar++;
-    LArMinuit->mnparm(iPar, "peakratio", 0.947, 0.001, 0.90, 1.0, ierrflag);      iPar++;
+    LArMinuit->mnparm(iPar, "peakratio", 0.937, 0.001, 0.90, 1.0, ierrflag);      iPar++;
     //LArMinuit->mnparm(iPar, "A1", 0.3, 0.01, 0., 0., ierrflag);      iPar++;
     LArMinuit->mnparm(iPar, "mu1",126.51, 0.1, 123, 129, ierrflag);     iPar++;
     LArMinuit->mnparm(iPar, "sigma1", 1, 0.01, 0.5, 2, ierrflag);    iPar++;
@@ -161,6 +161,7 @@ double LArChiFunction::GetChiSquare(double maxChi2)
     }
 
     if (m_fit_purified) {
+        LArMinuit->FixParameter(4);
         LArMinuit->FixParameter(5);
         LArMinuit->FixParameter(6);
         LArMinuit->FixParameter(8);

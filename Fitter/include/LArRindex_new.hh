@@ -19,6 +19,7 @@ class LArRindex_new
 
         static void setrho(double rho) {m_rho = rho;}
         static double getrho()         {return m_rho;}
+        static double CalcRindex(double wl) {return fRindex->Eval(wl);}
 
         static void SetParameters();    
 

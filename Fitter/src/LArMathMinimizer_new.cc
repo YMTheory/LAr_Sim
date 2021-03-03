@@ -99,6 +99,8 @@ int LArMathMinimizer_new::Minimization()
     minimum->SetVariable(7, "sigma2", variable[7], step[7]);
     minimum->SetVariable(8, "nu_f", variable[8], step[8]);
     minimum->SetVariable(9, "scale", variable[9], step[9]);
+    
+    minimum->FixVariable(0);
 
     if (m_fit_purified) {
         minimum->FixVariable(2);

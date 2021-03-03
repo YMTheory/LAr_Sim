@@ -85,7 +85,7 @@ int LArMathMinimizer::Minimization()
     variable[1] = 0.099;
     variable[2] = 0.008;
     variable[3] = 0.2;
-    variable[4] = 0.94;
+    variable[4] = 0.937;
     variable[5] = 126.51;
     variable[6] = 1;
     variable[7] = 0.4;
@@ -111,6 +111,7 @@ int LArMathMinimizer::Minimization()
     minimum->SetVariable(11, "scale", variable[11], step[11]);
 
     if (m_fit_purified) {
+        minimum->FixVariable(4);
         minimum->FixVariable(5);
         minimum->FixVariable(6);
         minimum->FixVariable(8);

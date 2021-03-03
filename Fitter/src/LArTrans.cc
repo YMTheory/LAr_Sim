@@ -208,6 +208,7 @@ void LArTrans::Calculate()
         double trans_pred = T_Ray * T_abs * corr * m_scale;
         //trans_pred *= (1+nu_R) * (1+nu_f);   // nuisance parameters
         
+        //cout << wl << " " << gData->GetY()[i] << " " << trans_pred << endl;
         gCalc->SetPoint(i, datax[i], trans_pred);
 
     }
