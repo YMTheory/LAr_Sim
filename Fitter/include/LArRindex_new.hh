@@ -19,6 +19,12 @@ class LArRindex_new
 
         static void setrho(double rho) {m_rho = rho;}
         static double getrho()         {return m_rho;}
+        static void seta0(double a0)   {m_a0 = a0;}
+        static double geta0()          {return m_a0;}
+        static void setaUV(double aUV)   {m_aUV = aUV;}
+        static double getaUV()          {return m_aUV;}
+        static void setaIR(double aIR)   {m_aIR = aIR;}
+        static double getaIR()          {return m_aIR;}
         static double CalcRindex(double wl) {return fRindex->Eval(wl);}
 
         static void SetParameters();    
@@ -27,6 +33,9 @@ class LArRindex_new
 
     private:
         static double m_rho;
+        static double m_a0;
+        static double m_aUV;
+        static double m_aIR;
 
     private:
         static TGraphErrors* gData;

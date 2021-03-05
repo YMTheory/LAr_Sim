@@ -40,6 +40,10 @@ double LArMathMinimizer_new::GetChi2(const double* xx)
     // pull term
     //LArGroupVelocity::setnulambda(xx[10]);
     LArTrans_new::setnuf(xx[8]);
+    LArTrans_new::setnukappaT(xx[10]);
+    LArRindex_new::seta0(xx[11]) ;
+    LArRindex_new::setaUV(xx[12]);
+    LArRindex_new::setaIR(xx[13]);
 
     // scale for purified spectra
     LArTrans_new::setscale(xx[9]);
@@ -67,14 +71,14 @@ int LArMathMinimizer_new::Minimization()
     minimum->SetPrintLevel(1);
 
     // function wrapper for Minimizer_new
-    ROOT::Math::Functor f(&GetChi2, 10);
-    double step[10];
-    for (int i=0; i<10; i++) {
+    ROOT::Math::Functor f(&GetChi2, 14);
+    double step[14];
+    for (int i=0; i<14; i++) {
         step[i] = 0.001;
     }
 
     // start point
-    double variable[10];
+    double variable[14];
     variable[0] = 1;
     variable[1] = 0.2;
     variable[2] = 0.937;
@@ -85,6 +89,10 @@ int LArMathMinimizer_new::Minimization()
     variable[7] = 1.537;
     variable[8] = 0;
     variable[9] = 1.00;
+    variable[10] = 0;
+    variable[11] = 0.335;
+    variable[12] = 0.099;
+    variable[13] = 0.008;
 
     minimum->SetFunction(f);
 
@@ -99,9 +107,11 @@ int LArMathMinimizer_new::Minimization()
     minimum->SetVariable(7, "sigma2", variable[7], step[7]);
     minimum->SetVariable(8, "nu_f", variable[8], step[8]);
     minimum->SetVariable(9, "scale", variable[9], step[9]);
+    minimum->SetVariable(10, "nu_kappaT", variable[10], step[10]);
+    minimum->SetVariable(11, "vara0", variable[11], step[11]);
+    minimum->SetVariable(12, "varaUV", variable[12], step[12]);
+    minimum->SetVariable(13, "varaIR", variable[13], step[13]);
     
-    minimum->FixVariable(0);
-
     if (m_fit_purified) {
         minimum->FixVariable(2);
         minimum->FixVariable(3);
@@ -111,7 +121,6 @@ int LArMathMinimizer_new::Minimization()
     } else {
         minimum->FixVariable(9);
     }
-
 
     // do the minimization
     minimum->Minimize();

@@ -14,11 +14,13 @@ double gRindex_new(Double_t* x, Double_t* p)
     double lUV = 0.1066;
     double lIR = 0.9083;
 
-    double a0  = 0.335;
-    double aUV = 0.099; 
-    double aIR = 0.008;
+    double a0  = p[1]; //0.335;
+    double aUV = p[2]; //0.099; 
+    double aIR = p[3]; //0.008;
 
-    double rho = p[0];
+    double rho = p[0]; // density scaling
+
+    //cout << a0 << " " << aUV << " " << aIR << endl;
 
     double A = ( a0 + aUV*l*l/(l*l-lUV*lUV) + aIR*l*l/(l*l-lIR*lIR) ) * rho;
     double n = TMath::Sqrt(1 + 3*A/(3-A));
@@ -26,6 +28,9 @@ double gRindex_new(Double_t* x, Double_t* p)
 }
 
 double LArRindex_new::m_rho = 1;
+double LArRindex_new::m_a0;
+double LArRindex_new::m_aUV;
+double LArRindex_new::m_aIR;
 TGraphErrors* LArRindex_new::gData = new TGraphErrors();
 TGraphErrors* LArRindex_new::gCalc = new TGraphErrors();
 TF1* LArRindex_new::fRindex;
@@ -40,7 +45,7 @@ void LArRindex_new::Initialize()
 {
 
     std::cout << "===========> LArRindex_new Initialization" << std::endl;
-    fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 1);
+    fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 4);
     LoadData();
 }
 
@@ -75,6 +80,11 @@ double LArRindex_new::GetChi2()
         double e    = datae[i];
         chi2 += (pred - y) * (pred - y) /e /e;
     }
+
+    // pull term due to fitting error :
+    chi2 += ((m_a0 - 0.335)/0.003 )  * ((m_a0-0.335)/0.003 ); 
+    chi2 += ((m_aUV - 0.099)/0.003 ) * ((m_aUV-0.099)/0.003 ); 
+    chi2 += ((m_aIR - 0.008)/0.003 ) * ((m_aIR-0.008)/0.003 ); 
     
     return chi2;
 }
@@ -94,11 +104,16 @@ void LArRindex_new::Calculate()
 void LArRindex_new::SetParameters()
 {
     fRindex->SetParameter(0, m_rho);
+    fRindex->SetParameter(1, m_a0);
+    fRindex->SetParameter(2, m_aUV);
+    fRindex->SetParameter(3, m_aIR);
 }
 
 void LArRindex_new::Plot()
 {
     SetParameters();
+
+    std::cout << "Rindex @128nm = " << fRindex->Eval(0.128) << std::endl;
 
     gData->SetMarkerStyle(20);
     gData->SetMarkerColor(kBlue+1);
