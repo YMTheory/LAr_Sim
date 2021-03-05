@@ -40,7 +40,7 @@ double LArMathMinimizer_new::GetChi2(const double* xx)
     // pull term
     //LArGroupVelocity::setnulambda(xx[10]);
     LArTrans_new::setnuf(xx[8]);
-    LArTrans_new::setnukappaT(xx[10]);
+    LArTrans_new::setkappaT(xx[10]);
     LArRindex_new::seta0(xx[11]) ;
     LArRindex_new::setaUV(xx[12]);
     LArRindex_new::setaIR(xx[13]);
@@ -89,7 +89,7 @@ int LArMathMinimizer_new::Minimization()
     variable[7] = 1.537;
     variable[8] = 0;
     variable[9] = 1.00;
-    variable[10] = 0;
+    variable[10] = 2.0e-9;
     variable[11] = 0.335;
     variable[12] = 0.099;
     variable[13] = 0.008;
@@ -107,7 +107,7 @@ int LArMathMinimizer_new::Minimization()
     minimum->SetVariable(7, "sigma2", variable[7], step[7]);
     minimum->SetVariable(8, "nu_f", variable[8], step[8]);
     minimum->SetVariable(9, "scale", variable[9], step[9]);
-    minimum->SetVariable(10, "nu_kappaT", variable[10], step[10]);
+    minimum->SetVariable(10, "kappaT", variable[10], step[10]);
     minimum->SetVariable(11, "vara0", variable[11], step[11]);
     minimum->SetVariable(12, "varaUV", variable[12], step[12]);
     minimum->SetVariable(13, "varaIR", variable[13], step[13]);

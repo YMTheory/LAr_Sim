@@ -95,6 +95,9 @@ double LArTrans_new::m_A2;
 double LArTrans_new::m_mu2;
 double LArTrans_new::m_sigma2;
 double LArTrans_new::m_scale;
+double LArTrans_new::m_kappaT;
+double LArTrans_new::m_meankappaT;
+double LArTrans_new::m_sigmakappaT;
 int LArTrans_new::depolarization = LArConfiguration::use_depolarization;
 int LArTrans_new::fixratio = LArConfiguration::fix_absratio;
 bool LArTrans_new::m_fit_purified = LArConfiguration::fit_purified;
@@ -164,6 +167,14 @@ void LArTrans_new::LoadData()
             idx++;
         }
     }
+
+    double kappaT0 = 1.9355e-9; // 84K
+    double kappaT1 = 1.9903e-9; // 85K
+    double kappaT2 = 2.0473e-9; // 86K
+    double kappaT3 = 2.1064e-9; // 87K
+
+    m_meankappaT = (kappaT0 + kappaT1 + kappaT2 + kappaT3) / 4.; // consider kappaT values at 4 conditions ...
+    m_sigmakappaT = max(kappaT3-m_meankappaT, m_meankappaT-kappaT0);
 }
 
 void LArTrans_new::SetParameters()
@@ -187,6 +198,7 @@ double LArTrans_new::GetChi2()
         chi2 += (predy[i]-datay[i]) * (predy[i]-datay[i]) / datae[i]/datae[i]; 
     }
     chi2 += (m_nuf)*(m_nuf)/(sigma_f)/(sigma_f);
+    chi2 += ((m_kappaT - m_meankappaT) / m_sigmakappaT ) * ((m_kappaT - m_meankappaT) / m_sigmakappaT);
         
     return chi2;
 }

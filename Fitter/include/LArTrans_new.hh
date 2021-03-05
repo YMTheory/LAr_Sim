@@ -40,6 +40,13 @@ class LArTrans_new
         static int getfixratio()             {return fixratio;}
         static double getscale()             {return m_scale;}
         static void setscale(double scale)   {m_scale = scale;}
+        static double getkappaT()            {return m_kappaT;}
+        static void setkappaT(double kappaT) {m_kappaT = kappaT;}
+        static double getmeankappaT()            {return m_meankappaT;}
+        static void setmeankappaT(double meankappaT) {m_meankappaT = meankappaT;}
+        static double getsigmakappaT()            {return m_sigmakappaT;}
+        static void setsigmakappaT(double sigmakappaT) {m_sigmakappaT = sigmakappaT;}
+
         static void SetParameters();
 
         static double CalcRayLength(double wl) {return fRayLength->Eval(wl);}
@@ -71,6 +78,10 @@ class LArTrans_new
         static double sigma_f;
 
         static double m_scale;
+
+        static double m_kappaT;
+        static double m_meankappaT;
+        static double m_sigmakappaT;
 
 };
 
