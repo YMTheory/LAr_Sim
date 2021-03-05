@@ -10,6 +10,12 @@
 
 using namespace std;
 
+// from fitting 
+double p0 =  6.0712e-11;
+double p1 = -3.1699e-09;
+double sigmap0 = TMath::Sqrt(1.49189964e-24);
+double sigmap1 = TMath::Sqrt(1.11432969e-20);
+
 double gRayLength_new(double* x, double* p)
 {
     double l = x[0];  // wavelength um
@@ -33,11 +39,16 @@ double gRayLength_delta_new(double* x, double* p)
     double l = x[0];  // wavelength um
     double rindex = p[0];  // rindex
     double delta = p[1];   // depolarization
+    double T = p[2];
+    
+    double n_p0 = p[3];
+    double n_p1 = p[4];
+    double kT = n_p0 * T + n_p1;
 
-    double kT = 2.25282E-9;
+    //double kT = 2.25282E-9;
     //double kT = 2.24442E-9;
     double kB = 1.380649E-23;
-    double T = 90; // K
+    //double T = 90; // K
     double f = 1e22;
     
     double pi = TMath::Pi();
@@ -98,6 +109,9 @@ double LArTrans_new::m_scale;
 double LArTrans_new::m_kappaT;
 double LArTrans_new::m_meankappaT;
 double LArTrans_new::m_sigmakappaT;
+double LArTrans_new::m_temp;
+double LArTrans_new::m_p0;
+double LArTrans_new::m_p1;
 int LArTrans_new::depolarization = LArConfiguration::use_depolarization;
 int LArTrans_new::fixratio = LArConfiguration::fix_absratio;
 bool LArTrans_new::m_fit_purified = LArConfiguration::fit_purified;
@@ -124,7 +138,7 @@ void LArTrans_new::Initialize()
         cout << "+++++++++++++++++++++++ Did not consider depolarization" << endl;
     }
     else if (depolarization==1) {
-        fRayLength = new TF1("fRayLength", gRayLength_delta_new, 0.11, 0.15, 2);
+        fRayLength = new TF1("fRayLength", gRayLength_delta_new, 0.11, 0.15, 5);
         cout << "+++++++++++++++++++++++ Did consider depolarization" << endl;
     }
 
@@ -180,6 +194,10 @@ void LArTrans_new::LoadData()
 void LArTrans_new::SetParameters()
 {
     fRayLength->SetParameter(1, m_delta);
+    fRayLength->SetParameter(2, m_temp);
+    fRayLength->SetParameter(3, m_p0);
+    fRayLength->SetParameter(4, m_p1); 
+
     fAbs->SetParameters(m_A1, m_mu1, m_sigma1, m_A2, m_mu2, m_sigma2);
 }
 
@@ -198,8 +216,10 @@ double LArTrans_new::GetChi2()
         chi2 += (predy[i]-datay[i]) * (predy[i]-datay[i]) / datae[i]/datae[i]; 
     }
     chi2 += (m_nuf)*(m_nuf)/(sigma_f)/(sigma_f);
-    chi2 += ((m_kappaT - m_meankappaT) / m_sigmakappaT ) * ((m_kappaT - m_meankappaT) / m_sigmakappaT);
-        
+    //chi2 += ((m_kappaT - m_meankappaT) / m_sigmakappaT ) * ((m_kappaT - m_meankappaT) / m_sigmakappaT);
+    chi2 += TMath::Power((m_p0-p0)/sigmap0, 2);  
+    chi2 += TMath::Power((m_p1-p1)/sigmap1, 2);  
+
     return chi2;
 }
 

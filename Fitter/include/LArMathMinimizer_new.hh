@@ -23,6 +23,8 @@ class LArMathMinimizer_new
 
         static bool Plot();
 
+        static void Profile1D(int index, double min, double max, double step, double CI);
+
     private:
         static bool m_fit_purified;
 };
