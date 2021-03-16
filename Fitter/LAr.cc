@@ -33,6 +33,14 @@ int main()
     LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
     minimizer->Initialize();
     minimizer->Minimization();
+    for (int j=0; j<100; j++) {
+        std::cout << "Processing " << j << "% ...." << std::endl;
+        for(int i=0; i<100; i++) {
+            minimizer->setlagRindex(1000/100*j - 500);
+            minimizer->setlagRayL(2/100.*i-1);
+            minimizer->Minimization();
+        } 
+    }
     //minimizer->Profile1D(1, 0.0, 0.6, 0.001, 1);
     //minimizer->Profile1D(2, 0.90, 0.99, 0.0001, 1);
     //int index[2] = {1, 2};
@@ -41,5 +49,5 @@ int main()
     //int num[2] = {1000, 1000};
     //minimizer->Profile2D(index, min, max, num);
 
-    minimizer->Plot();
+    //minimizer->Plot();
 }

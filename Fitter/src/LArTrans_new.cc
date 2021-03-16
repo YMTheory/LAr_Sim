@@ -50,6 +50,7 @@ double gRayLength_delta_new(double* x, double* p)
 
     double rayL = 1 / (8*TMath::Power(pi, 3)/3/TMath::Power(l, 4)
                 * ((rindex*rindex-1)*(rindex*rindex+2)/3)*((rindex*rindex-1)*(rindex*rindex+2)/3) * kT * kB * T * f * (6+3*delta)/(6-7*delta));
+
     //cout << rindex << " " << delta << " " << rayL << endl;
 
     return rayL;
@@ -312,4 +313,10 @@ void LArTrans_new::Plot()
 
 
 
+double LArTrans_new::CalcRayLength(double wl)
+{
+    double rindex = LArRindex_new::CalcRindex(wl);
+    fRayLength->SetParameter(0, rindex);
+    return fRayLength->Eval(wl);
+}
 

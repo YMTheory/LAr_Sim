@@ -35,7 +35,7 @@ z = ma.masked_where(z <=0, z)
 
 if __name__ == '__main__':
 
-    best, hist = load_rfile('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/delta_ratio_profile2d.root')
+    best, hist = load_rfile('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/delta_ratio_profile2d_new.root')
     bestx, besty = graph_data(best)
 
     x, y = [], []
@@ -57,11 +57,11 @@ if __name__ == '__main__':
     cs = ax.contourf(X, Y, z, levels=[0, 2.3, 11.83])
     #cs = ax.contourf(X, Y, z, cmap=cm.PuBu_r, levels=[0, 2.3, 11.83])
     
+    plt.plot([ 0.297, 0.317], [besty, besty], "-", color='orange')
+    plt.plot([bestx, bestx], [0.932, 0.943], "-", color='orange')
     plt.plot(bestx, besty, "*", ms=8, color='hotpink', label="best fit(Model 1)")
-    #plt.plot([0.2378, 0.2602], [besty, besty], "-", color='seagreen')
-    #plt.plot([bestx, bestx], [0.9314, 0.9424], "-", color='seagreen')
-    plt.plot([ 126.505, 126.523 ], [besty, besty], "-", color='hotpink')
-    plt.plot([bestx, bestx], [ 140.104, 140.139 ], "-", color='hotpink')
+    #plt.plot([ 126.505, 126.523 ], [besty, besty], "-", color='hotpink')
+    #plt.plot([bestx, bestx], [ 140.104, 140.139 ], "-", color='hotpink')
 
     # Alternatively, you can manually set the levels
     # and the norm:
@@ -81,18 +81,19 @@ if __name__ == '__main__':
     ax.yaxis.tick_right()
     ax.yaxis.set_label_position("right")
     plt.grid(True)
-    #plt.xlim(0.18, 0.32)
-    #plt.ylim(0.90, 0.98)
-    plt.xlim(126.46, 126.57)
-    plt.ylim(140.02, 140.22)
-    #plt.xlabel(r"$\delta$")
-    #plt.ylabel('Xe absorption ratio')
-    plt.xlabel("absorption peak1 /nm")
-    plt.ylabel("absorption peak2 /nm")
+    plt.xlim(0.24, 0.36)
+    plt.ylim(0.90, 0.97)
+    plt.xlabel(r"$\delta$")
+    plt.ylabel('Xe absorption ratio')
+    #plt.xlim(126.46, 126.57)
+    #plt.ylim(140.02, 140.22)
+    #plt.xlabel("absorption peak1 /nm")
+    #plt.ylabel("absorption peak2 /nm")
     plt.legend()
     plt.grid(True)
     ax.set_axisbelow(True)
+    plt.tight_layout()
 
 
-    #plt.savefig("profile2d_mu1mu2_model1.pdf")
+    plt.savefig("profile2d_delta_ratio_new.pdf")
     plt.show()

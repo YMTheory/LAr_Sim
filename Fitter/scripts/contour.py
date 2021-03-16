@@ -109,7 +109,7 @@ def raylength(wl, delta, n):
 if __name__=='__main__':
    
     
-    best, sigma1, sigma5 = load_graph("/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/contour_model1.root")
+    best, sigma1, sigma5 = load_graph("/Users/yumiao/Documents/Works/LAr_Sim/Fitter/delta_ratio_profile2d_new.root")
     bestx, besty = graph_data(best)
     sigma1x, sigma1y = graph_data(sigma1)
     sigma5x, sigma5y = graph_data(sigma5)
@@ -193,8 +193,8 @@ if __name__=='__main__':
     #plt.xlim(126.45, 126.57)
     #plt.ylim(140.07, 140.17)
     #plt.xlim(50, 70)
-    plt.xlim(0.23, 0.30)
-    plt.ylim(0.92, 0.96)
+    plt.xlim(0.24, 0.36)
+    plt.ylim(0.90, 0.97)
     plt.xlabel(r"$\delta$")
     plt.ylabel('Xe absorption ratio')
     #plt.ylabel(r"$L_{Ray}/cm$")

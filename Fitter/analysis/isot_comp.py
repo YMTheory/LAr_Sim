@@ -83,6 +83,9 @@ def main():
 
     plt.text(T[0], kappaT[4], r"$\kappa_T$ = %e*T+%e" %(popt[0], popt[1]), fontsize=14)
 
+    T_fit = 86.023
+    k_fit = 2.053E-9
+    plt.plot(T_fit, k_fit, "*", color='red', ms=9)
     #plt.xlabel("pressure/atm")
     #plt.ylabel("L/mol")
 

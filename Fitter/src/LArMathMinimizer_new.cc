@@ -17,6 +17,8 @@ double LArMathMinimizer_new::m_chi2Min;
 double LArMathMinimizer_new::m_bestFit[20];
 int LArMathMinimizer_new::m_npar;
 
+double LArMathMinimizer_new::m_lag_rindex = 0;
+double LArMathMinimizer_new::m_lag_rayL = 0;
 
 LArMathMinimizer_new::LArMathMinimizer_new()
 {}
@@ -66,6 +68,12 @@ double LArMathMinimizer_new::GetChi2(const double* xx)
 
     chi2 += LArTrans_new::GetChi2();
     
+    // Lagrange Multipliers...
+    double rindex = LArRindex_new::CalcRindex(0.128);
+    chi2 += m_lag_rindex * rindex;
+    double rayL = LArTrans_new::CalcRayLength(0.128);
+    chi2 += m_lag_rayL * rayL;
+
     return chi2;
 }
 
@@ -81,7 +89,7 @@ int LArMathMinimizer_new::Minimization()
     minimum->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
     minimum->SetMaxIterations(10000);  // for GSL
     minimum->SetTolerance(0.001);
-    minimum->SetPrintLevel(1);
+    minimum->SetPrintLevel(0);
 
     // function wrapper for Minimizer_new
     ROOT::Math::Functor f(&GetChi2, 17);
@@ -159,6 +167,16 @@ int LArMathMinimizer_new::Minimization()
         m_bestFit[i] = xx[i];
     }
 
+
+    cout << endl;
+    cout << " >>>>>>>>>>>>>>>> Fitting Resoluts <<<<<<<<<<<<<<<<< " << endl;
+    cout << " Fitting Rindex @128nm = " << LArRindex_new::CalcRindex(0.128) << endl;
+    cout << " Fitting LRay @128nm = " << LArTrans_new::CalcRayLength(0.128) << endl;
+    cout << "Lagrange " << LArRindex_new::CalcRindex(0.128) << " " << LArTrans_new::CalcRayLength(0.128) << " " << m_chi2Min - m_lag_rindex*LArRindex_new::CalcRindex(0.128) - m_lag_rayL*LArTrans_new::CalcRayLength(0.128) << endl;
+    cout << " >>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<< " << endl;
+    cout << endl;
+
+    
 
     /*
     // Cov Matrix
@@ -277,8 +295,10 @@ void LArMathMinimizer_new::Profile2D(int *index, double* min, double* max, int *
     for(int i=0; i<m_npar; i++) pars[i] = m_bestFit[i];
     int i0 = index[0]; int i1 = index[1];
 
-    TGraph* g1 = new TGraph(); g1->SetName("sigma1"); int id1 = 0;
-    TGraph* g5 = new TGraph(); g5->SetName("sigma5"); int id5 = 0;
+    TH2D* hist = new TH2D("hist", "", num[0], min[0], max[0], num[1], min[1], max[1]);
+
+    //TGraph* g1 = new TGraph(); g1->SetName("sigma1"); int id1 = 0;
+    //TGraph* g5 = new TGraph(); g5->SetName("sigma5"); int id5 = 0;
 
     int ibin = num[0]; int jbin = num[1];
     for(int i=0; i<ibin; i++) {
@@ -293,9 +313,10 @@ void LArMathMinimizer_new::Profile2D(int *index, double* min, double* max, int *
 
             double tmp_chi2 = GetChi2(pars) - m_chi2Min;
 
-            if (TMath::Abs(tmp_chi2 -2.30) < 0.01) { g1->SetPoint(id1, p0, p1); id1++;}
-            if (TMath::Abs(tmp_chi2 -11.83) < 0.05) { g5->SetPoint(id5, p0, p1); id5++;}
+            //if (TMath::Abs(tmp_chi2 -2.30) < 0.01) { g1->SetPoint(id1, p0, p1); id1++;}
+            //if (TMath::Abs(tmp_chi2 -11.83) < 0.05) { g5->SetPoint(id5, p0, p1); id5++;}
 
+            hist->SetBinContent(i+1, j+1, tmp_chi2);
         }
     }
     TGraph* bestpoint = new TGraph(); bestpoint->SetName("best");
@@ -303,19 +324,19 @@ void LArMathMinimizer_new::Profile2D(int *index, double* min, double* max, int *
     bestpoint->SetMarkerStyle(20);
     bestpoint->SetMarkerColor(kBlue+1);
 
-    g1->SetMarkerColor(kPink+2);
-    g1->SetMarkerStyle(20);
-    g1->SetMarkerSize(0.5);
+    //g1->SetMarkerColor(kPink+2);
+    //g1->SetMarkerStyle(20);
+    //g1->SetMarkerSize(0.5);
 
-    g5->SetMarkerColor(kGreen+2);
-    g5->SetMarkerStyle(20);
-    g5->SetMarkerSize(0.5);
+    //g5->SetMarkerColor(kGreen+2);
+    //g5->SetMarkerStyle(20);
+    //g5->SetMarkerSize(0.5);
 
 
     TCanvas* cc = new TCanvas();
-    //hist->Draw("COLZ");
-    g5->Draw("AP");
-    g1->Draw("P SAME");
+    hist->Draw("COLZ");
+    //g5->Draw("AP");
+    //g1->Draw("P SAME");
     bestpoint->Draw("P SAME");
     
     cc->SaveAs("Profile2D.root");

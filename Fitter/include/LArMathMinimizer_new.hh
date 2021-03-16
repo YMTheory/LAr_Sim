@@ -25,6 +25,12 @@ class LArMathMinimizer_new
 
         static void Profile1D(int index, double min, double max, double step, double CI);
         static void Profile2D(int* index, double *min, double *max, int *num);
+    
+    public:
+        static void setlagRindex(double lagRindex) {m_lag_rindex = lagRindex;}
+        static double getlagRindex()               {return m_lag_rindex;}
+        static void setlagRayL(double lagrayL) {m_lag_rayL = lagrayL;}
+        static double getlagRayL()               {return m_lag_rayL;}
 
     private:
         static bool m_fit_purified;
@@ -32,6 +38,11 @@ class LArMathMinimizer_new
         static double m_chi2Min;
         static int m_npar;
         static double m_bestFit[20];
+
+    private:
+        static double m_lag_rindex;
+        static double m_lag_rayL;
+
 };
 
 #endif

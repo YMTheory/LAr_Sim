@@ -59,7 +59,7 @@ class LArTrans_new
 
         static void SetParameters();
 
-        static double CalcRayLength(double wl) {return fRayLength->Eval(wl);}
+        static double CalcRayLength(double wl);
 
     private:
         static TGraphErrors* gData;
