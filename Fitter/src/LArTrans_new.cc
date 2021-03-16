@@ -7,14 +7,9 @@
 
 #include "TCanvas.h"
 #include "TLegend.h"
+#include "TMath.h"
 
 using namespace std;
-
-// from fitting 
-double p0 =  6.0712e-11;
-double p1 = -3.1699e-09;
-double sigmap0 = TMath::Sqrt(1.49189964e-24);
-double sigmap1 = TMath::Sqrt(1.11432969e-20);
 
 double gRayLength_new(double* x, double* p)
 {
@@ -110,8 +105,16 @@ double LArTrans_new::m_kappaT;
 double LArTrans_new::m_meankappaT;
 double LArTrans_new::m_sigmakappaT;
 double LArTrans_new::m_temp;
+double LArTrans_new::temp = 86;
+double LArTrans_new::sigma_temp = 3./TMath::Sqrt(12);
 double LArTrans_new::m_p0;
 double LArTrans_new::m_p1;
+// from fitting 
+double LArTrans_new::p0 =  6.0712e-11;
+double LArTrans_new::p1 = -3.1699e-09;
+double LArTrans_new::sigmap0 = TMath::Sqrt(1.49189964e-24);
+double LArTrans_new::sigmap1 = TMath::Sqrt(1.11432969e-20);
+
 int LArTrans_new::depolarization = LArConfiguration::use_depolarization;
 int LArTrans_new::fixratio = LArConfiguration::fix_absratio;
 bool LArTrans_new::m_fit_purified = LArConfiguration::fit_purified;
@@ -215,10 +218,15 @@ double LArTrans_new::GetChi2()
         predy[i] *= (1+m_nuf);
         chi2 += (predy[i]-datay[i]) * (predy[i]-datay[i]) / datae[i]/datae[i]; 
     }
+
+    // add pull term
     chi2 += (m_nuf)*(m_nuf)/(sigma_f)/(sigma_f);
     //chi2 += ((m_kappaT - m_meankappaT) / m_sigmakappaT ) * ((m_kappaT - m_meankappaT) / m_sigmakappaT);
     chi2 += TMath::Power((m_p0-p0)/sigmap0, 2);  
     chi2 += TMath::Power((m_p1-p1)/sigmap1, 2);  
+
+    // temperature pull term
+    chi2 += TMath::Power((m_temp - temp)/sigma_temp, 2);
 
     return chi2;
 }

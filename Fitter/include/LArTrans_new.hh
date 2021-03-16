@@ -52,6 +52,10 @@ class LArTrans_new
         static void setp0(double p0)                    {m_p0 = p0;}
         static double getp1()                           {return m_p1;}
         static void setp1(double p1)                    {m_p1 = p1;}
+        static double getp0_init()                      {return p0;}
+        static void setp0_init(double p0_init)               {p0 = p0_init;}
+        static double getp1_init()                      {return p1;}
+        static void setp1_init(double p1_init)               {p1 = p1_init;}
 
         static void SetParameters();
 
@@ -86,6 +90,8 @@ class LArTrans_new
         static double m_scale;
 
         static double m_temp;
+        static double temp;
+        static double sigma_temp;
 
         static double m_kappaT;
         static double m_meankappaT;
@@ -93,12 +99,12 @@ class LArTrans_new
 
         static double m_p0;
         static double m_p1;
+        static double p0;
+        static double p1;
+        static double sigmap0;
+        static double sigmap1;
 };
 
-extern double p0;
-extern double p1;
-extern double sigmap0;
-extern double sigmap1;
 
 extern double gRayLength_new(double* x, double* p);
 extern double gRayLength_delta_new(double* x, double* p);

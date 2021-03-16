@@ -35,7 +35,7 @@ z = ma.masked_where(z <=0, z)
 
 if __name__ == '__main__':
 
-    best, hist = load_rfile('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/contour_mu1mu2_model1.root')
+    best, hist = load_rfile('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/delta_ratio_profile2d.root')
     bestx, besty = graph_data(best)
 
     x, y = [], []
@@ -94,5 +94,5 @@ if __name__ == '__main__':
     ax.set_axisbelow(True)
 
 
-    plt.savefig("profile2d_mu1mu2_model1.pdf")
+    #plt.savefig("profile2d_mu1mu2_model1.pdf")
     plt.show()

@@ -203,5 +203,5 @@ if __name__=='__main__':
     plt.grid(True)
 
 
-    plt.savefig("profile2d_deltaratio_model1.pdf")
+    #plt.savefig("profile2d_deltaratio_model1.pdf")
     plt.show()

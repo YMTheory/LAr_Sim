@@ -28,6 +28,7 @@ double rindex_ba(double *par)
     double lIR = 0.9083;
 
     double A = a0 + aUV*l*l/(l*l-lUV*lUV) + aIR*l*l/(l*l-lIR*lIR) ;
+    cout << "x part = " << A << " and tot = " << 3*A/(3-A) << endl;
 
     return sqrt(1+3*A/(3-A));
 }

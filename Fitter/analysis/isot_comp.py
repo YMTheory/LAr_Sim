@@ -55,6 +55,8 @@ def main():
     plt.plot(p3, v3, "o", label="T=%d K"%T[3], color="darkviolet")
     plt.plot(x, y3, color="darkviolet")
     """
+    
+    """
 
     p4, v4 = load("data4.txt")
     popt4, pcov4 = curve_fit(linearfunc, p4, v4)
@@ -63,15 +65,33 @@ def main():
     plt.plot(x, y4, color="darkviolet")
 
     plt.text(x[4], y4[2], "slope=%e" %popt4[0], fontsize=12)
+    """
 
-    plt.xlabel("pressure/atm")
-    plt.ylabel("L/mol")
+    kappaT = [1.9355e-9, 1.9903e-9, 2.0475e-9, 2.1064e-9, 2.2983e-9]  # m2/N
+
+    popt, pcov = curve_fit(linearfunc, T, kappaT)
+    print(popt)
+    print(pcov)
+    dx = np.arange(83, 91, 0.1)
+    dy = linearfunc(dx, *popt)
+    plt.plot(dx, dy, "--")
+
+    plt.plot(T, kappaT, "o")
+    plt.xlabel("temperature/K")
+    plt.ylabel(r"$m^2/N$")    
+    plt.title("LAr isothermal compressibility")
+
+    plt.text(T[0], kappaT[4], r"$\kappa_T$ = %e*T+%e" %(popt[0], popt[1]), fontsize=14)
+
+    #plt.xlabel("pressure/atm")
+    #plt.ylabel("L/mol")
 
     plt.tight_layout()
-    plt.legend()
+    #plt.legend()
     plt.grid(True)
+    #ax.set_axisbelow(True)
 
-    plt.savefig("VP_fig5.pdf")
+    plt.savefig("kappaT_T.pdf")
     plt.show()
 
 

@@ -2,19 +2,19 @@
 
 int main()
 {
-    LArChiFunction* LArFCN = new LArChiFunction();
-    LArFCN->Initialize();
-    LArFCN->setfactor1(0);
-    LArFCN->setfactor2(0);
-    LArFCN->setfactor3(0);
-    LArFCN->GetChiSquare(10000);
+    //LArChiFunction* LArFCN = new LArChiFunction();
+    //LArFCN->Initialize();
+    //LArFCN->setfactor1(0);
+    //LArFCN->setfactor2(0);
+    //LArFCN->setfactor3(0);
+    //LArFCN->GetChiSquare(10000);
 
     //for (int i=0; i<100; i++) {
     //        LArFCN->setfactor3(-1000+20*i);
     //        LArFCN->GetChiSquare(10000);
     //}
     
-    LArFCN->Plot();
+    //LArFCN->Plot();
 
     //LArFCN->Profile1D(3, 0.0, 0.5, 0.0001, 5);
     
@@ -25,4 +25,21 @@ int main()
     
     //LArFCN->Lray_profile();
 
+    //LArMathMinimizer* minimizer;
+    //minimizer->Initialize();
+    //minimizer->Minimization();
+    //minimizer->Plot();
+
+    LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
+    minimizer->Initialize();
+    minimizer->Minimization();
+    //minimizer->Profile1D(1, 0.0, 0.6, 0.001, 1);
+    //minimizer->Profile1D(2, 0.90, 0.99, 0.0001, 1);
+    //int index[2] = {1, 2};
+    //double min[2] = {0.1, 0.88};
+    //double max[2] = {0.4, 0.99};
+    //int num[2] = {1000, 1000};
+    //minimizer->Profile2D(index, min, max, num);
+
+    minimizer->Plot();
 }

@@ -8,6 +8,7 @@
 using namespace std;
 
 
+double m_rho90K = 0.03449;
 double gRindex_new(Double_t* x, Double_t* p) 
 {
     double l = x[0];
@@ -18,7 +19,11 @@ double gRindex_new(Double_t* x, Double_t* p)
     double aUV = p[2]; //0.099; 
     double aIR = p[3]; //0.008;
 
-    double rho = p[0]; // density scaling
+    double T = p[0];
+    double p0 = p[4];
+    double p1 = p[5];
+
+    double rho = ( p0*T + p1 ) / m_rho90K; // density scaling
 
     //cout << a0 << " " << aUV << " " << aIR << endl;
 
@@ -27,6 +32,13 @@ double gRindex_new(Double_t* x, Double_t* p)
     return n;
 }
 
+double LArRindex_new::p0 = -0.000158;
+double LArRindex_new::p1 = 0.0487;
+double LArRindex_new::sigma_p0 = 0.000004;
+double LArRindex_new::sigma_p1 = 0.0003;
+double LArRindex_new::m_p0;
+double LArRindex_new::m_p1;
+double LArRindex_new::m_temp = 86;
 double LArRindex_new::m_rho = 1;
 double LArRindex_new::m_a0;
 double LArRindex_new::m_aUV;
@@ -45,7 +57,7 @@ void LArRindex_new::Initialize()
 {
 
     std::cout << "===========> LArRindex_new Initialization" << std::endl;
-    fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 4);
+    fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 6);
     LoadData();
 }
 
@@ -85,6 +97,9 @@ double LArRindex_new::GetChi2()
     chi2 += ((m_a0 - 0.335)/0.003 )  * ((m_a0-0.335)/0.003 ); 
     chi2 += ((m_aUV - 0.099)/0.003 ) * ((m_aUV-0.099)/0.003 ); 
     chi2 += ((m_aIR - 0.008)/0.003 ) * ((m_aIR-0.008)/0.003 ); 
+
+    chi2 += ((m_p0 - p0)/sigma_p0) * ((m_p0 - p0)/sigma_p0);
+    chi2 += ((m_p1 - p1)/sigma_p1) * ((m_p1 - p1)/sigma_p1);
     
     return chi2;
 }
@@ -103,10 +118,12 @@ void LArRindex_new::Calculate()
 
 void LArRindex_new::SetParameters()
 {
-    fRindex->SetParameter(0, m_rho);
+    fRindex->SetParameter(0, m_temp);
     fRindex->SetParameter(1, m_a0);
     fRindex->SetParameter(2, m_aUV);
     fRindex->SetParameter(3, m_aIR);
+    fRindex->SetParameter(4, m_p0);
+    fRindex->SetParameter(5, m_p1);
 }
 
 void LArRindex_new::Plot()

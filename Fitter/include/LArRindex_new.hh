@@ -17,14 +17,24 @@ class LArRindex_new
         static double GetChi2();
 
 
-        static void setrho(double rho) {m_rho = rho;}
-        static double getrho()         {return m_rho;}
-        static void seta0(double a0)   {m_a0 = a0;}
-        static double geta0()          {return m_a0;}
-        static void setaUV(double aUV)   {m_aUV = aUV;}
-        static double getaUV()          {return m_aUV;}
-        static void setaIR(double aIR)   {m_aIR = aIR;}
-        static double getaIR()          {return m_aIR;}
+        static void settemp(double temp)    {m_temp = temp;}
+        static double gettemp()             {return m_temp;}
+        static void setrho(double rho)      {m_rho = rho;}
+        static double getrho()              {return m_rho;}
+        static void seta0(double a0)        {m_a0 = a0;}
+        static double geta0()               {return m_a0;}
+        static void setaUV(double aUV)      {m_aUV = aUV;}
+        static double getaUV()              {return m_aUV;}
+        static void setaIR(double aIR)      {m_aIR = aIR;}
+        static double getaIR()              {return m_aIR;}
+        static void setp0(double p0)        {m_p0 = p0;}
+        static double getp0()               {return m_p0;}
+        static void setp1(double p1)        {m_p1 = p1;}
+        static double getp1()               {return m_p1;}
+        static double getp0_init()          {return p0;}
+        static void setp0_init(double p0_init)               {p0 = p0_init;}
+        static double getp1_init()                      {return p1;}
+        static void setp1_init(double p1_init)               {p1 = p1_init;}
         static double CalcRindex(double wl) {return fRindex->Eval(wl);}
 
         static void SetParameters();    
@@ -32,6 +42,17 @@ class LArRindex_new
         static void Plot();
 
     private:
+        static double m_p0;
+        static double m_p1;
+        static double p0;
+        static double p1;
+        static double sigma_p0;
+        static double sigma_p1;
+
+        static double m_temp;
+        static double temp;
+        static double sigma_temp;
+
         static double m_rho;
         static double m_a0;
         static double m_aUV;
@@ -45,6 +66,7 @@ class LArRindex_new
 
 };
 
+extern double m_rho90K;
 extern double gRindex_new(double *x, double *p);
 
 #endif

@@ -53,7 +53,7 @@ if __name__=='__main__':
     plt.style.use('seaborn-deep')
 
     #graph1, zone1, line1 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/delta.root')
-    graph1, zone1, line1 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/delta_5sigma.root')
+    graph1, zone1, line1 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/delta_5sigma_new.root')
     #graph2, zone2, line2 = load_graph('/Users/yumiao/Documents/Works/LAr_Sim/Fitter/outputs/delta_model2.root')
 
     scanx1, scany1, scanl1 = [], [], []
@@ -81,8 +81,8 @@ if __name__=='__main__':
     figr = fig.add_subplot(111)
 
     plt.plot(scanx1, scany1, "-", color='royalblue')
-    plt.plot(linex1, liney1, "--", color='blue', label="best fit(Model 1)")
-    plt.fill_between([zonex1[0], zonex1[-1]], [0, 0], [zoney1[1], zoney1[1]], alpha=0.2, color='purple', label="5sigma C.I.(Model 1)")
+    plt.plot(linex1, liney1, "--", color='blue', label="best fit")
+    plt.fill_between([zonex1[0], zonex1[-1]], [0, 0], [zoney1[1], zoney1[1]], alpha=0.2, color='purple', label="5sigma C.I.")
 
     #plt.hlines(25, 0, 0.5, color='magenta', linestyles="-.")
     #plt.text(0.04, 60, r"$5 \sigma$ C.I.")
@@ -91,7 +91,7 @@ if __name__=='__main__':
     #plt.plot(scanl1, scany1, '-', color='royalblue')
     #plt.plot(linel1, liney1, "--", color='blue', label="best fit(Model 1)")
     #plt.fill_between([zonel1[0], zonel1[-1]], [0, 0], [zoney1[1], zoney1[1]], alpha=0.2, color='royalblue', label="5sigma C.I.(Model 1)")
-    plt.ylim(0, liney1[-1])
+    #plt.ylim(0, liney1[-1])
 
 
     """
@@ -127,7 +127,7 @@ if __name__=='__main__':
     plt.legend(loc='upper left')
     #plt.xlim(0.92, 0.96)
     plt.xlim(0.0, 0.50)
-    #plt.ylim(0, 20)
+    plt.ylim(0, 500)
     #plt.xlim(126.45, 126.57)
     #plt.xlim(140.07, 140.17)
 
@@ -138,5 +138,5 @@ if __name__=='__main__':
     #figr.axes.get_xaxis().set_visible(False)
     #plt.xticks([])
 
-    plt.savefig("profile_delta_0zone_model1.pdf")
+    plt.savefig("profile_delta_5sigma_new.pdf")
     plt.show()
