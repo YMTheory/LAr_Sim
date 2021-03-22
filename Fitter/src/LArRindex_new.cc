@@ -1,9 +1,11 @@
 #include "LArRindex_new.hh"
+#include "LArConfiguration.hh"
 
 #include "TF1.h"
 #include "TMath.h"
 #include "TCanvas.h"
 #include "TAxis.h"
+#include "TRandom.h"
 
 using namespace std;
 
@@ -43,8 +45,12 @@ double LArRindex_new::m_rho = 1;
 double LArRindex_new::m_a0;
 double LArRindex_new::m_aUV;
 double LArRindex_new::m_aIR;
+bool LArRindex_new::m_loadData = false;
+bool LArRindex_new::m_toyMC = LArConfiguration::m_toyMC;
+
 TGraphErrors* LArRindex_new::gData = new TGraphErrors();
 TGraphErrors* LArRindex_new::gCalc = new TGraphErrors();
+TGraphErrors* LArRindex_new::gtoyMC = new TGraphErrors();
 TF1* LArRindex_new::fRindex;
 
 LArRindex_new::LArRindex_new()
@@ -59,6 +65,7 @@ void LArRindex_new::Initialize()
     std::cout << "===========> LArRindex_new Initialization" << std::endl;
     fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 6);
     LoadData();
+    if (m_toyMC) toyMC();
 }
 
 void LArRindex_new::LoadData()
@@ -74,6 +81,8 @@ void LArRindex_new::LoadData()
         gData->SetPoint(i, m_wavelength[i], mean);
         gData->SetPointError(i, 0, err);
     }
+
+    m_loadData = true;
 }
 
 double LArRindex_new::GetChi2()
@@ -155,4 +164,18 @@ void LArRindex_new::Plot()
     gDraw->Draw("L SAME");
 
     cc->SaveAs("rindex-new.root");
+}
+
+
+
+void LArRindex_new::toyMC()
+{
+    if (!m_loadData)
+        LoadData();
+    
+    for(int i=0; i<gData->GetN(); i++ ) {
+        double tmp = gRandom->Gaus(gData->GetY()[i], gData->GetEY()[i]);
+        gtoyMC->SetPoint(i, gData->GetX()[i], tmp);
+        gtoyMC->SetPointError(i, 0, gData->GetEY()[i]);
+    }
 }

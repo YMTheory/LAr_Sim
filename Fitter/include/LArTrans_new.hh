@@ -59,11 +59,14 @@ class LArTrans_new
 
         static void SetParameters();
 
+        static void toyMC();
+
         static double CalcRayLength(double wl);
 
     private:
         static TGraphErrors* gData;
         static TGraphErrors* gCalc;
+        static TGraphErrors* gtoyMC;
 
         static TF1* fRayLength;
         static TF1* fAbs;
@@ -103,6 +106,9 @@ class LArTrans_new
         static double p1;
         static double sigmap0;
         static double sigmap1;
+
+        static bool m_loadData;
+        static bool m_toyMC;
 };
 
 

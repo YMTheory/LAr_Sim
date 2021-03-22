@@ -16,6 +16,8 @@ class LArConfiguration
         static double factor1;  // Xe peak ratio
         static double factor2;  // Rayleigh scattering length
         static double factor3;  // refractive index
+
+        static bool m_toyMC;
 };
 
 #endif

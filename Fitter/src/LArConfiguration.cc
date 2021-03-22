@@ -12,3 +12,5 @@ double LArConfig::factor2 = 0.;
 double LArConfig::factor3 = 0.;
 
 bool LArConfig::fit_purified = false;
+
+bool LArConfig::m_toyMC = false;

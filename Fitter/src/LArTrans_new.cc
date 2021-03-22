@@ -8,6 +8,8 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TMath.h"
+#include "TRandom.h"
+#include "TGraphErrors.h"
 
 using namespace std;
 
@@ -110,6 +112,8 @@ double LArTrans_new::temp = 86;
 double LArTrans_new::sigma_temp = 3./TMath::Sqrt(12);
 double LArTrans_new::m_p0;
 double LArTrans_new::m_p1;
+bool LArTrans_new::m_loadData = false;
+bool LArTrans_new::m_toyMC = LArConfiguration::m_toyMC;
 // from fitting 
 double LArTrans_new::p0 =  6.0712e-11;
 double LArTrans_new::p1 = -3.1699e-09;
@@ -127,6 +131,7 @@ double LArTrans_new::m_nuf = 0;
 
 TGraphErrors* LArTrans_new::gData;
 TGraphErrors* LArTrans_new::gCalc;
+TGraphErrors* LArTrans_new::gtoyMC;
 TF1* LArTrans_new::fRayLength;
 TF1* LArTrans_new::fAbs;
 TF1* LArTrans_new::fCorr;
@@ -163,6 +168,8 @@ void LArTrans_new::Initialize()
     gCalc = new TGraphErrors();
 
     LoadData();
+    
+    if(m_toyMC) toyMC();
 }
 
 void LArTrans_new::LoadData()
@@ -193,6 +200,8 @@ void LArTrans_new::LoadData()
 
     m_meankappaT = (kappaT0 + kappaT1 + kappaT2 + kappaT3) / 4.; // consider kappaT values at 4 conditions ...
     m_sigmakappaT = max(kappaT3-m_meankappaT, m_meankappaT-kappaT0);
+
+    m_loadData = true;
 }
 
 void LArTrans_new::SetParameters()
@@ -320,3 +329,16 @@ double LArTrans_new::CalcRayLength(double wl)
     return fRayLength->Eval(wl);
 }
 
+
+void LArTrans_new::toyMC()
+{
+    if(!m_loadData)
+        LoadData();
+
+    for(int i=0; i<gData->GetN(); i++ )
+    {
+        double tmp = gRandom->Gaus(gData->GetY()[i], gData->GetEY()[i]);
+        gtoyMC->SetPoint(i, gData->GetX()[i], tmp);
+        gtoyMC->SetPointError(i, 0, gData->GetEY()[i]);
+    }
+}

@@ -39,6 +39,8 @@ class LArRindex_new
 
         static void SetParameters();    
 
+        static void toyMC();
+
         static void Plot();
 
     private:
@@ -58,9 +60,14 @@ class LArRindex_new
         static double m_aUV;
         static double m_aIR;
 
+        static bool   m_loadData;
+        static bool   m_toyMC;
+
+
     private:
         static TGraphErrors* gData;
         static TGraphErrors* gCalc;
+        static TGraphErrors* gtoyMC;
 
         static TF1* fRindex;
 
