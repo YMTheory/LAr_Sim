@@ -3,6 +3,7 @@
 
 #include <TGraphErrors.h>
 #include "TF1.h"
+#include "TRandom.h"
 
 class LArRindex_new
 {
@@ -36,6 +37,8 @@ class LArRindex_new
         static double getp1_init()                      {return p1;}
         static void setp1_init(double p1_init)               {p1 = p1_init;}
         static double CalcRindex(double wl) {return fRindex->Eval(wl);}
+
+        static void setseed(double seed)  {gRandom->SetSeed(seed);}
 
         static void SetParameters();    
 

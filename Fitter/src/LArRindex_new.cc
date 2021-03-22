@@ -91,8 +91,14 @@ double LArRindex_new::GetChi2()
 
     double chi2 = 0;
 
-    double *datay = gData->GetY();
-    double *datae = gData->GetEY();
+    double *datay, *datae;
+    if (!m_toyMC) {
+        datay = gData->GetY();
+        datae = gData->GetEY();     
+    } else {
+        datay = gtoyMC->GetY();
+        datae = gtoyMC->GetEY();     
+    }
     double *calcy = gCalc->GetY();
 
     for(int i=0; i<gData->GetN(); i++) {

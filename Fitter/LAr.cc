@@ -32,15 +32,23 @@ int main()
 
     LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
     minimizer->Initialize();
-    minimizer->Minimization();
-    for (int j=0; j<100; j++) {
-        std::cout << "Processing " << j << "% ...." << std::endl;
-        for(int i=0; i<100; i++) {
-            minimizer->setlagRindex(1000/100*j - 500);
-            minimizer->setlagRayL(2/100.*i-1);
-            minimizer->Minimization();
-        } 
+    for(int i=10000; i<20000; i++) {
+        LArRindex_new::setseed(i);
+        LArRindex_new::toyMC();
+        LArTrans_new::setseed(i);
+        LArTrans_new::toyMC();
+        minimizer->Minimization();
     }
+
+    //for (int j=0; j<200; j++) {
+    //    std::cout << "Processing " << j/2. << "% ...." << std::endl;
+    //    for(int i=0; i<200; i++) {
+    //        minimizer->setlagRindex(1000/200*j - 500);
+    //        minimizer->setlagRayL(2/200.*i-1);
+    //        minimizer->Minimization();
+    //    } 
+    //}
+
     //minimizer->Profile1D(1, 0.0, 0.6, 0.001, 1);
     //minimizer->Profile1D(2, 0.90, 0.99, 0.0001, 1);
     //int index[2] = {1, 2};

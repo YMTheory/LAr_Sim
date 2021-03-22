@@ -13,4 +13,4 @@ double LArConfig::factor3 = 0.;
 
 bool LArConfig::fit_purified = false;
 
-bool LArConfig::m_toyMC = false;
+bool LArConfig::m_toyMC = true;

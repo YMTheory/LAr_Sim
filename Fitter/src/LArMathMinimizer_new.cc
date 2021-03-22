@@ -9,6 +9,7 @@
 #include <TH2D.h>
 
 #include "LArMathMinimizer_new.hh"
+#include "LArConfiguration.hh"
 
 using namespace std;
 
@@ -28,6 +29,9 @@ LArMathMinimizer_new::~LArMathMinimizer_new()
 
 void LArMathMinimizer_new::Initialize()
 {
+    if (LArConfiguration::m_toyMC)
+        cout << " >>> Current in toyMC Mode <<< " << endl;
+
     LArRindex_new::Initialize();
     LArTrans_new::Initialize();
 
@@ -169,10 +173,11 @@ int LArMathMinimizer_new::Minimization()
 
 
     cout << endl;
-    cout << " >>>>>>>>>>>>>>>> Fitting Resoluts <<<<<<<<<<<<<<<<< " << endl;
+    cout << " >>>>>>>>>>>>>>>> Fitting Results <<<<<<<<<<<<<<<<< " << endl;
     cout << " Fitting Rindex @128nm = " << LArRindex_new::CalcRindex(0.128) << endl;
     cout << " Fitting LRay @128nm = " << LArTrans_new::CalcRayLength(0.128) << endl;
     cout << "Lagrange " << LArRindex_new::CalcRindex(0.128) << " " << LArTrans_new::CalcRayLength(0.128) << " " << m_chi2Min - m_lag_rindex*LArRindex_new::CalcRindex(0.128) - m_lag_rayL*LArTrans_new::CalcRayLength(0.128) << endl;
+    cout << "delta value = " << m_bestFit[1] << endl;
     cout << " >>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<< " << endl;
     cout << endl;
 
@@ -297,9 +302,6 @@ void LArMathMinimizer_new::Profile2D(int *index, double* min, double* max, int *
 
     TH2D* hist = new TH2D("hist", "", num[0], min[0], max[0], num[1], min[1], max[1]);
 
-    //TGraph* g1 = new TGraph(); g1->SetName("sigma1"); int id1 = 0;
-    //TGraph* g5 = new TGraph(); g5->SetName("sigma5"); int id5 = 0;
-
     int ibin = num[0]; int jbin = num[1];
     for(int i=0; i<ibin; i++) {
         for(int j=0; j<jbin; j++) {
@@ -313,9 +315,6 @@ void LArMathMinimizer_new::Profile2D(int *index, double* min, double* max, int *
 
             double tmp_chi2 = GetChi2(pars) - m_chi2Min;
 
-            //if (TMath::Abs(tmp_chi2 -2.30) < 0.01) { g1->SetPoint(id1, p0, p1); id1++;}
-            //if (TMath::Abs(tmp_chi2 -11.83) < 0.05) { g5->SetPoint(id5, p0, p1); id5++;}
-
             hist->SetBinContent(i+1, j+1, tmp_chi2);
         }
     }
@@ -324,19 +323,9 @@ void LArMathMinimizer_new::Profile2D(int *index, double* min, double* max, int *
     bestpoint->SetMarkerStyle(20);
     bestpoint->SetMarkerColor(kBlue+1);
 
-    //g1->SetMarkerColor(kPink+2);
-    //g1->SetMarkerStyle(20);
-    //g1->SetMarkerSize(0.5);
-
-    //g5->SetMarkerColor(kGreen+2);
-    //g5->SetMarkerStyle(20);
-    //g5->SetMarkerSize(0.5);
-
 
     TCanvas* cc = new TCanvas();
     hist->Draw("COLZ");
-    //g5->Draw("AP");
-    //g1->Draw("P SAME");
     bestpoint->Draw("P SAME");
     
     cc->SaveAs("Profile2D.root");

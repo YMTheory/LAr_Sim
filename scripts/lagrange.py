@@ -10,11 +10,11 @@ def func(x, a, b, c):
 
 def main():
     rindex, chi2 = [], []
-    with open('./rindex_scan.txt') as f:
+    with open('../rindex_lag.txt') as f:
         for lines in f.readlines():
             line = lines.strip('\n')
             data = line.split(' ')
-            rindex.append(float(data[2]))
+            rindex.append(float(data[0]))
             chi2.append(float(data[1]))
 
     popt1, pcov1 = curve_fit(func, rindex, chi2, p0=[344860, 1.357, 208])
@@ -34,7 +34,7 @@ def main():
     plt.xlabel("rindex")
     plt.ylabel(r"$\chi^2$")
 
-    plt.savefig("Lagrange_rindex128.png")
+    #plt.savefig("Lagrange_rindex128.png")
     plt.show()
 
 

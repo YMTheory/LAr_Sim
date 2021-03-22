@@ -5,6 +5,7 @@
 
 #include "TGraphErrors.h"
 #include "TF1.h"
+#include "TRandom.h"
 
 class LArTrans_new
 {
@@ -60,6 +61,7 @@ class LArTrans_new
         static void SetParameters();
 
         static void toyMC();
+        static void setseed(double seed)  {gRandom->SetSeed(seed);}
 
         static double CalcRayLength(double wl);
 
