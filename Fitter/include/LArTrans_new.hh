@@ -65,6 +65,8 @@ class LArTrans_new
 
         static double CalcRayLength(double wl);
 
+            
+
     private:
         static TGraphErrors* gData;
         static TGraphErrors* gCalc;

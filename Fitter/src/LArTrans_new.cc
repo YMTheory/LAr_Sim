@@ -342,10 +342,27 @@ void LArTrans_new::toyMC()
     if(!m_loadData)
         LoadData();
 
-    for(int i=0; i<gData->GetN(); i++ )
-    {
-        double tmp = gRandom->Gaus(gData->GetY()[i], gData->GetEY()[i]);
-        gtoyMC->SetPoint(i, gData->GetX()[i], tmp);
-        gtoyMC->SetPointError(i, 0, gData->GetEY()[i]);
+    cout << " >>> Generate Toy Datasets for transmission spectrum" << endl;
+
+    SetParameters();
+
+    for (int i=0; i<gCalc->GetN(); i++) {
+        double wl = gCalc->GetX()[i];
+        double rindex = LArRindex_new::CalcRindex(gCalc->GetX()[i]);
+        fRayLength->SetParameter(0, rindex);
+        fRayLength->SetParameter(1, 0);  // no delta hypothesis generation
+        double d = 5.8;
+        double rayL = fRayLength->Eval(wl);
+        double T_Ray = TMath::Exp(-d/rayL);
+        fCorr->SetParameter(0, rindex);
+        double corr = fCorr->Eval(wl);
+        double T_abs = fAbs->Eval(wl);
+        double trans_pred = T_Ray * T_abs * corr * m_scale;
+
+        double sigma = gCalc->GetEY()[i];
+        trans_pred = gRandom->Gaus(trans_pred, sigma);
+
+        gtoyMC->SetPoint(i, gCalc->GetX()[i], trans_pred);
     }
 }
+

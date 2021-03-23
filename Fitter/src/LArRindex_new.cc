@@ -179,9 +179,11 @@ void LArRindex_new::toyMC()
     if (!m_loadData)
         LoadData();
     
-    for(int i=0; i<gData->GetN(); i++ ) {
-        double tmp = gRandom->Gaus(gData->GetY()[i], gData->GetEY()[i]);
-        gtoyMC->SetPoint(i, gData->GetX()[i], tmp);
-        gtoyMC->SetPointError(i, 0, gData->GetEY()[i]);
+    cout << " >>> Generate Toy Datasets for transmission spectrum" << endl;
+
+    for(int i=0; i<gCalc->GetN(); i++ ) {
+        double tmp = gRandom->Gaus(gCalc->GetY()[i], gCalc->GetEY()[i]);
+        gtoyMC->SetPoint(i, gCalc->GetX()[i], tmp);
+        gtoyMC->SetPointError(i, 0, gCalc->GetEY()[i]);
     }
 }
