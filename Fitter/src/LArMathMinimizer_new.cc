@@ -21,6 +21,8 @@ int LArMathMinimizer_new::m_npar;
 double LArMathMinimizer_new::m_lag_rindex = 0;
 double LArMathMinimizer_new::m_lag_rayL = 0;
 
+bool LArMathMinimizer_new::m_delta = true;
+
 LArMathMinimizer_new::LArMathMinimizer_new()
 {}
 
@@ -31,6 +33,8 @@ void LArMathMinimizer_new::Initialize()
 {
     if (LArConfiguration::m_toyMC)
         cout << " >>> Current in toyMC Mode <<< " << endl;
+    else
+        cout << " >>> Current in real-data Mode <<< " << endl;
 
     LArRindex_new::Initialize();
     LArTrans_new::Initialize();
@@ -82,7 +86,7 @@ double LArMathMinimizer_new::GetChi2(const double* xx)
 }
 
 
-int LArMathMinimizer_new::Minimization()
+int LArMathMinimizer_new::Minimization(int num, int* ivar, double *init)
 {
 
     //ROOT::Minuit2::Minuit2Minimizer_new minimum (ROOT::Minuit2::kMigrad);
@@ -157,6 +161,18 @@ int LArMathMinimizer_new::Minimization()
         minimum->FixVariable(9);
     }
     
+    if (!m_delta)  { 
+        minimum->SetVariableValue(1, 0.0);
+        minimum->FixVariable(1);
+    }
+
+    for (int i=0; i<num; i++) {
+        int var_id = ivar[i];
+        double var_init = init[i];
+        minimum->SetVariableValue(var_id, var_init);
+        minimum->FixVariable(var_id);
+    }
+
     //minimum->FixVariable(14);
     //minimum->FixVariable(15);
 
@@ -176,9 +192,9 @@ int LArMathMinimizer_new::Minimization()
     cout << " >>>>>>>>>>>>>>>> Fitting Results <<<<<<<<<<<<<<<<< " << endl;
     cout << " Fitting Rindex @128nm = " << LArRindex_new::CalcRindex(0.128) << endl;
     cout << " Fitting LRay @128nm = " << LArTrans_new::CalcRayLength(0.128) << endl;
-    cout << "Lagrange " << LArRindex_new::CalcRindex(0.128) << " " << LArTrans_new::CalcRayLength(0.128) << " " << m_chi2Min - m_lag_rindex*LArRindex_new::CalcRindex(0.128) - m_lag_rayL*LArTrans_new::CalcRayLength(0.128) << endl;
-    cout << "delta value = " << m_bestFit[1] << endl;
-    cout << "apar = " << m_bestFit[10] << " " << m_bestFit[11] << " " << m_bestFit[12] << endl;
+    cout << " Lagrange " << LArRindex_new::CalcRindex(0.128) << " " << LArTrans_new::CalcRayLength(0.128) << " " << m_chi2Min - m_lag_rindex*LArRindex_new::CalcRindex(0.128) - m_lag_rayL*LArTrans_new::CalcRayLength(0.128) << endl;
+    cout << "Fitvalue = " << m_bestFit[1] << " " << m_bestFit[2] << " " << minimum->MinValue() << endl;
+    cout << " apar = " << m_bestFit[10] << " " << m_bestFit[11] << " " << m_bestFit[12] << endl;
     cout << " >>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<< " << endl;
     cout << endl;
 
@@ -236,6 +252,8 @@ bool LArMathMinimizer_new::Plot()
 
 void LArMathMinimizer_new::Profile1D(int index, double min, double max, double step, double CI)
 {
+    // One mistake here: profile likelihood needs to do minimization for each scanned values...
+
     TGraph* graph = new TGraph(); graph->SetName("graph");
     double pars[20];
     for(int i=0; i<m_npar; i++) pars[i] = m_bestFit[i];

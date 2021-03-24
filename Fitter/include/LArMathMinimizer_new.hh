@@ -19,7 +19,7 @@ class LArMathMinimizer_new
         //         const char *algoName ,
         //         int randomSeed );
 
-        static int Minimization();
+        static int Minimization(int num, int* ivar, double *init);
 
         static bool Plot();
 
@@ -29,8 +29,13 @@ class LArMathMinimizer_new
     public:
         static void setlagRindex(double lagRindex) {m_lag_rindex = lagRindex;}
         static double getlagRindex()               {return m_lag_rindex;}
-        static void setlagRayL(double lagrayL) {m_lag_rayL = lagrayL;}
-        static double getlagRayL()               {return m_lag_rayL;}
+        static void setlagRayL(double lagrayL)     {m_lag_rayL = lagrayL;}
+        static double getlagRayL()                 {return m_lag_rayL;}
+
+        static void setDelta(bool delta)           {m_delta = delta;}
+        static bool getDelta()                     {return m_delta;}
+
+        static double getChiMin()                  {return m_chi2Min;}
 
     private:
         static bool m_fit_purified;
@@ -42,6 +47,8 @@ class LArMathMinimizer_new
     private:
         static double m_lag_rindex;
         static double m_lag_rayL;
+
+        static bool m_delta;
 
 };
 

@@ -46,7 +46,7 @@ double LArRindex_new::m_a0;
 double LArRindex_new::m_aUV;
 double LArRindex_new::m_aIR;
 bool LArRindex_new::m_loadData = false;
-bool LArRindex_new::m_toyMC = LArConfiguration::m_toyMC;
+bool LArRindex_new::m_toyMC = false;
 
 TGraphErrors* LArRindex_new::gData = new TGraphErrors();
 TGraphErrors* LArRindex_new::gCalc = new TGraphErrors();
@@ -65,7 +65,6 @@ void LArRindex_new::Initialize()
     std::cout << "===========> LArRindex_new Initialization" << std::endl;
     fRindex = new TF1("fRindex", gRindex_new, 0.1, 0.7, 6);
     LoadData();
-    if (m_toyMC) toyMC();
 }
 
 void LArRindex_new::LoadData()

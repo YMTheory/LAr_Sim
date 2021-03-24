@@ -113,7 +113,7 @@ double LArTrans_new::sigma_temp = 3./TMath::Sqrt(12);
 double LArTrans_new::m_p0;
 double LArTrans_new::m_p1;
 bool LArTrans_new::m_loadData = false;
-bool LArTrans_new::m_toyMC = LArConfiguration::m_toyMC;
+bool LArTrans_new::m_toyMC = false;
 // from fitting 
 double LArTrans_new::p0 =  6.0712e-11;
 double LArTrans_new::p1 = -3.1699e-09;
@@ -170,7 +170,6 @@ void LArTrans_new::Initialize()
 
     LoadData();
     
-    if(m_toyMC) toyMC();
 }
 
 void LArTrans_new::LoadData()
@@ -234,6 +233,7 @@ double LArTrans_new::GetChi2()
     for (int i=0; i<gData->GetN(); i++) {
         predy[i] *= (1+m_nuf);
         chi2 += (predy[i]-datay[i]) * (predy[i]-datay[i]) / datae[i]/datae[i]; 
+        //cout << predy[i] << " " << datay[i] << " " << datae[i] << " " << chi2 << endl;
     }
 
     // add pull term
@@ -363,6 +363,7 @@ void LArTrans_new::toyMC()
         trans_pred = gRandom->Gaus(trans_pred, sigma);
 
         gtoyMC->SetPoint(i, gCalc->GetX()[i], trans_pred);
+        gtoyMC->SetPointError(i, 0, gData->GetEY()[i]);
     }
 }
 

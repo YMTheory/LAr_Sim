@@ -18,6 +18,9 @@ class LArConfiguration
         static double factor3;  // refractive index
 
         static bool m_toyMC;
+
+    public:
+        static void setMC(bool MC)    {m_toyMC = MC;}
 };
 
 #endif

@@ -30,15 +30,16 @@ int main()
     //minimizer->Minimization();
     //minimizer->Plot();
 
-    LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
-    minimizer->Initialize();
-    for(int i=10000; i<20000; i++) {
-        LArRindex_new::setseed(i);
-        LArRindex_new::toyMC();
-        LArTrans_new::setseed(i);
-        LArTrans_new::toyMC();
-        minimizer->Minimization();
-    }
+    //LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
+    //minimizer->Initialize();
+    //minimizer->Minimization();
+    //for(int i=10000; i<20000; i++) {
+    //    LArRindex_new::setseed(i);
+    //    LArRindex_new::toyMC();
+    //    LArTrans_new::setseed(i);
+    //    LArTrans_new::toyMC();
+    //    minimizer->Minimization();
+    //}
 
     //for (int j=0; j<200; j++) {
     //    std::cout << "Processing " << j/2. << "% ...." << std::endl;
@@ -58,4 +59,46 @@ int main()
     //minimizer->Profile2D(index, min, max, num);
 
     //minimizer->Plot();
+
+
+    double chi2[10];
+    double chi2_nodelta[10];
+    double delta_chi2[10];
+
+    // profile
+    LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
+    minimizer->Initialize();
+    int num = 2;
+    int ivar[2] = {1, 2};
+    double init[2] = {0.0, 0};
+
+    for(int i=0; i<500; i++) {
+        std::cout << "Processing " << i / 500. *100 << "% ..." << std::endl;
+        for(int j=0; j<600; j++) {
+            init[0] = 0.5/500 *i ;
+            init[1] = 0.12/600*j + 0.88;
+            minimizer->Minimization(num, ivar, init);
+        }
+    }
+
+    // toyMC generation on profile distribution:
+    //LArRindex_new::toyMC();
+    //LArTrans_new::toyMC();
+
+    //LArRindex_new::setMC(true);
+    //LArTrans_new::setMC(true);
+    //minimizer->setlagRindex(10);
+    //minimizer->Minimization();
+    //for (int i=0; i<1; i++) {
+    //    minimizer->setDelta(true);
+    //    minimizer->Minimization();
+    //    chi2[i] = minimizer->getChiMin();
+
+    //    //minimizer->setDelta(false);
+    //    //minimizer->Minimization();
+    //    //chi2_nodelta[i] = minimizer->getChiMin();
+
+    //    //delta_chi2[i] = chi2_nodelta[i] - chi2[i];
+    //}
+
 }

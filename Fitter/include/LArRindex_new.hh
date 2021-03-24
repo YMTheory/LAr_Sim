@@ -39,6 +39,7 @@ class LArRindex_new
         static double CalcRindex(double wl) {return fRindex->Eval(wl);}
 
         static void setseed(double seed)  {gRandom->SetSeed(seed);}
+        static void setMC(bool MC)        {m_toyMC = MC;}
 
         static void SetParameters();    
 

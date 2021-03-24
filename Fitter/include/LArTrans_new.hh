@@ -62,6 +62,7 @@ class LArTrans_new
 
         static void toyMC();
         static void setseed(double seed)  {gRandom->SetSeed(seed);}
+        static void setMC(bool MC)        {m_toyMC = MC;}
 
         static double CalcRayLength(double wl);
 
