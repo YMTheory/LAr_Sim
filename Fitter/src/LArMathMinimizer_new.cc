@@ -97,7 +97,7 @@ int LArMathMinimizer_new::Minimization(int num, int* ivar, double *init)
     minimum->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
     minimum->SetMaxIterations(10000);  // for GSL
     minimum->SetTolerance(0.001);
-    minimum->SetPrintLevel(1);
+    minimum->SetPrintLevel(0);
 
     // function wrapper for Minimizer_new
     ROOT::Math::Functor f(&GetChi2, 17);
@@ -188,15 +188,15 @@ int LArMathMinimizer_new::Minimization(int num, int* ivar, double *init)
     }
 
 
-    cout << endl;
-    cout << " >>>>>>>>>>>>>>>> Fitting Results <<<<<<<<<<<<<<<<< " << endl;
-    cout << " Fitting Rindex @128nm = " << LArRindex_new::CalcRindex(0.128) << endl;
-    cout << " Fitting LRay @128nm = " << LArTrans_new::CalcRayLength(0.128) << endl;
-    cout << " Lagrange " << LArRindex_new::CalcRindex(0.128) << " " << LArTrans_new::CalcRayLength(0.128) << " " << m_chi2Min - m_lag_rindex*LArRindex_new::CalcRindex(0.128) - m_lag_rayL*LArTrans_new::CalcRayLength(0.128) << endl;
-    cout << "Fitvalue = " << m_bestFit[1] << " " << m_bestFit[2] << " " << minimum->MinValue() << endl;
-    cout << " apar = " << m_bestFit[10] << " " << m_bestFit[11] << " " << m_bestFit[12] << endl;
-    cout << " >>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<< " << endl;
-    cout << endl;
+    //cout << endl;
+    //cout << " >>>>>>>>>>>>>>>> Fitting Results <<<<<<<<<<<<<<<<< " << endl;
+    //cout << " Fitting Rindex @128nm = " << LArRindex_new::CalcRindex(0.128) << endl;
+    //cout << " Fitting LRay @128nm = " << LArTrans_new::CalcRayLength(0.128) << endl;
+    //cout << " Lagrange " << LArRindex_new::CalcRindex(0.128) << " " << LArTrans_new::CalcRayLength(0.128) << " " << m_chi2Min - m_lag_rindex*LArRindex_new::CalcRindex(0.128) - m_lag_rayL*LArTrans_new::CalcRayLength(0.128) << endl;
+    cout << "Fitvalue = " << m_bestFit[1] << " " << m_bestFit[2] << " " << m_chi2Min << endl;
+    //cout << " apar = " << m_bestFit[10] << " " << m_bestFit[11] << " " << m_bestFit[12] << endl;
+    //cout << " >>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<< " << endl;
+    //cout << endl;
 
     
 
