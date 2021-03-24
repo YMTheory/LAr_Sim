@@ -1,6 +1,8 @@
 #include "LAr.hh"
 
-int main()
+using namespace std;
+
+int main(int argc, char* argv[])
 {
     //LArChiFunction* LArFCN = new LArChiFunction();
     //LArFCN->Initialize();
@@ -61,9 +63,17 @@ int main()
     //minimizer->Plot();
 
 
-    double chi2[10];
-    double chi2_nodelta[10];
-    double delta_chi2[10];
+    //double chi2[10];
+    //double chi2_nodelta[10];
+    //double delta_chi2[10];
+
+    if (argc != 3) { 
+        cout << "Wrong Argument Number ..." << endl;
+        return 0; 
+    }
+
+    int begin = int(atof(argv[1]));
+    int end   = int(atof(argv[2]));
 
     // profile
     LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
@@ -72,7 +82,7 @@ int main()
     int ivar[2] = {1, 2};
     double init[2] = {0.0, 0};
 
-    for(int i=0; i<500; i++) {
+    for(int i=begin; i<end; i++) {
         std::cout << "Processing " << i / 500. *100 << "% ..." << std::endl;
         for(int j=0; j<600; j++) {
             init[0] = 0.5/500 *i ;
