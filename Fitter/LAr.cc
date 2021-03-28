@@ -67,29 +67,35 @@ int main(int argc, char* argv[])
     //double chi2_nodelta[10];
     //double delta_chi2[10];
 
-    if (argc != 3) { 
-        cout << "Wrong Argument Number ..." << endl;
-        return 0; 
-    }
+    //if (argc != 3) { 
+    //    cout << "Wrong Argument Number ..." << endl;
+    //    return 0; 
+    //}
 
-    int begin = int(atof(argv[1]));
-    int end   = int(atof(argv[2]));
+    //int begin = int(atof(argv[1]));
+    //int end   = int(atof(argv[2]));
 
-    // profile
+    //// profile
     LArMathMinimizer_new * minimizer = new LArMathMinimizer_new();
     minimizer->Initialize();
-    int num = 2;
+    int num = 0;
     int ivar[2] = {1, 2};
     double init[2] = {0.0, 0};
+    minimizer->Minimization(num, ivar, init);
+    minimizer->Plot();
 
-    for(int i=begin; i<end; i++) {
-        std::cout << "Processing " << i / 500. *100 << "% ..." << std::endl;
-        for(int j=0; j<600; j++) {
-            init[0] = 0.5/500 *i ;
-            init[1] = 0.12/600*j + 0.88;
-            minimizer->Minimization(num, ivar, init);
-        }
-    }
+    //for(int i=begin; i<end; i++) {
+    //    std::cout << "Processing " << i / 500. *100 << "% ..." << std::endl;
+    //    for(int j=0; j<600; j++) {
+    //        init[0] = 0.5/500 *i ;
+    //        init[1] = 0.12/600*j + 0.88;
+    //        minimizer->Minimization(num, ivar, init);
+    //    }
+    //}
+
+    
+
+
 
     // toyMC generation on profile distribution:
     //LArRindex_new::toyMC();

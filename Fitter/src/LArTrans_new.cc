@@ -80,7 +80,7 @@ double gAbs_new(Double_t* x, Double_t* p)
 
 double gCorr_new(Double_t* x, Double_t* p)
 {
-    Double_t wl = x[1/0]*1000.;
+    Double_t wl = x[0]*1000.;
     Double_t E = 1240./wl;
 
     Double_t a = 38.;
@@ -99,9 +99,9 @@ double gCorr_new(Double_t* x, Double_t* p)
 
 double gFiniteDiv(double* x, double *p)
 {
-    double x0 = 17.5;
-    double x1 = 11.6;
-    double x2 = 36.5;
+    double x0 = 17.5 + 5.8/2;
+    double x1 = 5.8;
+    double x2 = 36.5 + 5.8/2;
     double n = p[0];
     return ((x0+x1+x2)/(x0+x1/n+x2))*((x0+x1+x2)/(x0+x1/n+x2));
 }
@@ -191,8 +191,8 @@ void LArTrans_new::LoadData()
     if (m_fit_purified)
         in.open("./data/data2012.txt");
     else
-        //in.open("./data/G140ppb.txt");
-        in.open("./data/cell116mm.txt");
+        in.open("./data/G140ppb.txt");
+        //in.open("./data/cell116mm.txt");
     string line;
     double m_wl, m_tran, m_tran_err;
     Int_t idx = 0;
@@ -269,8 +269,8 @@ void LArTrans_new::Calculate()
         double wl = gData->GetX()[i];
         double rindex = LArRindex_new::CalcRindex(datax[i]);
         fRayLength->SetParameter(0, rindex);
-        //double d = 5.8;
-        double d = 11.6;
+        double d = 5.8;
+        //double d = 11.6;
         double rayL = fRayLength->Eval(wl);
         double T_Ray = TMath::Exp(-d/rayL);
         fCorr->SetParameter(0, rindex);
@@ -313,7 +313,8 @@ void LArTrans_new::Plot()
         //Double_t fdiv = fFiniteDiv->Eval(0);
         Double_t rayL = fRayLength->Eval(wl);
         Double_t T_abs = fAbs->Eval(wl);
-        Double_t T_Ray = TMath::Exp(-11.6/(rayL)) ;
+        Double_t d = 5.8;  //cm
+        Double_t T_Ray = TMath::Exp(-d/(rayL)) ;
         Double_t trans_pred = T_Ray * T_abs;
         pred_graph->SetPoint(i, wl, trans_pred);
         abs_graph->SetPoint(i, wl, T_abs);
