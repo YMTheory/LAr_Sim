@@ -34,9 +34,9 @@ def find_interval(var, chi):
 
 def main():
 
-    delta, chi, chimin = read("./profile1D_delta.txt")
+    delta, chi, chimin = read("./profile1D_ratio.txt")
     left, right = find_interval(delta, chi-chimin)
-    print("[%.2f, %.2f]" %(left, right))
+    print("[%.4f, %.4f]" %(left, right))
 
     plt.plot(delta, chi-chimin, "-", color='blue')
     plt.fill_betweenx([0, 20], left, right, color='violet', alpha=0.4)
@@ -46,7 +46,7 @@ def main():
     #plt.xlim(0, 0.5)
 
     plt.grid(True)
-    plt.savefig("profile1D_delta.pdf")
+    #plt.savefig("profile1D_delta.pdf")
     plt.show()
 
 

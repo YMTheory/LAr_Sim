@@ -11,22 +11,23 @@ def read(filename):
         for lines in f.readlines():
             line = lines.strip("\n")
             data = line.split(" ")
-            delta.append(float(data[0]))
-            ratio.append(float(data[1]))
+            delta.append(float(data[0])*1000)
+            ratio.append(float(data[1])*10000)
             chi.append(float(data[2]))
 
     delta = np.array(delta)
     ratio = np.array(ratio)
     chi = np.array(chi)
+    chi = chi - 206.785
     return delta, ratio, chi
 
 
 def fill_th2d(delta, ratio, chi):
     hh = TH2D("profile2d", "", 500, 0, 0.5, 600, 0.88, 1.0)
     for i in range(len(delta)):
-        binx = int(delta[i]/(0.5/500)) + 1
-        biny = int((ratio[i]-0.88)/(0.12/600)) + 1
-        print("%d, %d, %.3f" %(binx, biny, chi[i]))
+        binx = int(delta[i]) + 1
+        biny = int(((ratio[i]-8800)/2)) + 1
+        #print("%.4f, %.4f, %d, %d, %.3f" %(delta[i], ratio[i], binx, biny, chi[i]))
         hh.SetBinContent(binx, biny, chi[i])
 
     return hh
@@ -45,22 +46,50 @@ def draw_cont(hist):
         tmp = []
         for j in range(500):
             #print(hist.GetBinContent(i+1, j+1))
-            tmp.append(hist.GetBinContent(i+1, j+1))
+            tmp.append(hist.GetBinContent(j+1, i+1))
         z.append(tmp)
 
-    fig, ax = plt.subplots(figsize=(8, 6))
-    #cs = ax.contourf(x, y, z, levels=[0, 2.3, 11.83])
-    #cs = ax.contourf(X, Y, z, cmap=cm.PuBu_r, levels=[0, 2.3, 11.83])
+    fig, ax = plt.subplots()
+    ##cs = ax.contourf(x, y, z, levels=[0, 2.3, 11.83])
+    cs = ax.contourf(x, y, z, levels=[0, 2.3, 11.83])
+    #cs = ax.contourf(x, y, z, cmap=cm.PuBu_r, levels=[0, 2.3, 11.83])
     
-    ax.imshow(z, extent=[x[0], x[-1], y[0], y[-1]])
+    #cs = ax.imshow(z, extent=[x[0], x[-1], y[0], y[-1]], aspect='auto')
+    cbar = fig.colorbar(cs, orientation='vertical', pad=0.15)
+    cbar.ax.set_yticks([0, 2.3, 11.83])
+    cbar.ax.set_yticklabels([0, r"$1\sigma$", r"$3\sigma$"])
 
-    #cbar = fig.colorbar(cs, orientation='vertical', pad=0.2)
-    plt.show()
+    ax.yaxis.tick_right()
+    ax.yaxis.set_label_position("right")
+    ax.set_axisbelow(True)
 
 def main():
-    delta, ratio, chi = read("/scratchfs/higgs/yumiao/LAr/profile2D.txt")
+    filelist = []
+    path = '../'
+    for i in range(50):
+        filename = "profile2D_delta+ratio_" + str(i) + ".txt"
+        filelist.append(path+filename)
+    delta, ratio, chi = [], [], []
+    for ff in filelist:
+        tmpdelta, tmpratio, tmpchi = read(ff)
+        delta.extend(tmpdelta)
+        ratio.extend(tmpratio)
+        chi.extend(tmpchi)
     hh = fill_th2d(delta, ratio, chi)
     draw_cont(hh)
+
+    plt.plot([0.2489, 0.3601], [0.937, 0.937], color='orange', lw=1)
+    plt.plot([0.307, 0.307], [0.9218, 0.9533], color='orange', lw=1)
+    plt.plot(0.307, 0.937, "*", color='hotpink', ms=8, label="Best Fit")
+
+    plt.legend()
+    plt.xlim(0, 0.5)
+    plt.grid(True)
+    plt.xlabel(r"$\delta$")
+    plt.ylabel("Xe absorption peak ratio")
+    plt.tight_layout()
+    plt.savefig("profile2d_delta+ratio.pdf")
+    plt.show()
 
 if __name__=="__main__":
     main()
