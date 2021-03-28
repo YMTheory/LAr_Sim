@@ -10,6 +10,7 @@
 #include "TMath.h"
 #include "TRandom.h"
 #include "TGraphErrors.h"
+#include "TAxis.h"
 
 using namespace std;
 
@@ -79,7 +80,7 @@ double gAbs_new(Double_t* x, Double_t* p)
 
 double gCorr_new(Double_t* x, Double_t* p)
 {
-    Double_t wl = x[0]*1000.;
+    Double_t wl = x[1/0]*1000.;
     Double_t E = 1240./wl;
 
     Double_t a = 38.;
@@ -94,6 +95,15 @@ double gCorr_new(Double_t* x, Double_t* p)
     Double_t n_LAr = p[0];
 
     return 1/TMath::Power( (1-TMath::Power((n_vac-n_MgF2)/(n_vac+n_MgF2),2))/(1-TMath::Power((n_MgF2-n_LAr)/(n_MgF2+n_LAr) ,2))  ,2);
+}
+
+double gFiniteDiv(double* x, double *p)
+{
+    double x0 = 17.5;
+    double x1 = 11.6;
+    double x2 = 36.5;
+    double n = p[0];
+    return ((x0+x1+x2)/(x0+x1/n+x2))*((x0+x1+x2)/(x0+x1/n+x2));
 }
 
 double LArTrans_new::m_delta;
@@ -135,6 +145,7 @@ TGraphErrors* LArTrans_new::gtoyMC;
 TF1* LArTrans_new::fRayLength;
 TF1* LArTrans_new::fAbs;
 TF1* LArTrans_new::fCorr;
+TF1* LArTrans_new::fFiniteDiv;
 
 
 LArTrans_new::LArTrans_new()
@@ -163,6 +174,7 @@ void LArTrans_new::Initialize()
 
     fAbs = new TF1("fAbs", gAbs_new, 0.11, 0.15, 6);
     fCorr = new TF1("fCorr", gCorr_new, 0.1, 0.2, 1);
+    fFiniteDiv = new TF1("fFiniteDiv", gFiniteDiv, 0.1, 0.2, 1);
 
     gData = new TGraphErrors();
     gCalc = new TGraphErrors();
@@ -179,7 +191,8 @@ void LArTrans_new::LoadData()
     if (m_fit_purified)
         in.open("./data/data2012.txt");
     else
-        in.open("./data/G140ppb.txt");
+        //in.open("./data/G140ppb.txt");
+        in.open("./data/cell116mm.txt");
     string line;
     double m_wl, m_tran, m_tran_err;
     Int_t idx = 0;
@@ -256,13 +269,16 @@ void LArTrans_new::Calculate()
         double wl = gData->GetX()[i];
         double rindex = LArRindex_new::CalcRindex(datax[i]);
         fRayLength->SetParameter(0, rindex);
-        double d = 5.8;
+        //double d = 5.8;
+        double d = 11.6;
         double rayL = fRayLength->Eval(wl);
         double T_Ray = TMath::Exp(-d/rayL);
         fCorr->SetParameter(0, rindex);
         double corr = fCorr->Eval(wl);
+        fFiniteDiv->SetParameter(0, rindex);
+        double fdiv = fFiniteDiv->Eval(0);
         double T_abs = fAbs->Eval(wl);
-        double trans_pred = T_Ray * T_abs * corr * m_scale;
+        double trans_pred = T_Ray * T_abs * fdiv * corr * m_scale;
         //trans_pred *= (1+nu_R) * (1+nu_f);   // nuisance parameters
         
         //cout << wl << " " << gData->GetY()[i] << " " << trans_pred << endl;
@@ -278,19 +294,26 @@ void LArTrans_new::Plot()
     TGraph* ray_graph  = new TGraph();
     TGraphErrors* data_graph = new TGraphErrors();
     for(Int_t i=0; i<gData->GetN(); i++) {
+        Double_t wl = gData->GetPointX(i);
+        Double_t rindex = LArRindex_new::CalcRindex(wl);
+        fCorr->SetParameter(0, rindex);
+        fFiniteDiv->SetParameter(0, rindex);
         Double_t corr = fCorr->Eval(gData->GetPointX(i));
-        data_graph->SetPoint(i, gData->GetPointX(i), gData->GetPointY(i)/corr);
+        Double_t fdiv = fFiniteDiv->Eval(0);
+        data_graph->SetPoint(i, gData->GetPointX(i), gData->GetPointY(i)/corr/fdiv/m_scale);
         data_graph->SetPointError(i, 0, gData->GetEY()[i]);
     }
     for (Int_t i=0; i<1000; i++) {
         Double_t wl = ((150.-125.)/1000*i + 125. )/1000.;
         Double_t rindex = LArRindex_new::CalcRindex(wl);
         fRayLength->SetParameter(0, rindex);
-        fCorr->SetParameter(0, rindex);
-        Double_t corr = fCorr->Eval(wl);
+        //fCorr->SetParameter(0, rindex);
+        //Double_t corr = fCorr->Eval(wl);
+        //fFiniteDiv->SetParameter(0, rindex);
+        //Double_t fdiv = fFiniteDiv->Eval(0);
         Double_t rayL = fRayLength->Eval(wl);
         Double_t T_abs = fAbs->Eval(wl);
-        Double_t T_Ray = TMath::Exp(-5.8/(rayL)) ;
+        Double_t T_Ray = TMath::Exp(-11.6/(rayL)) ;
         Double_t trans_pred = T_Ray * T_abs;
         pred_graph->SetPoint(i, wl, trans_pred);
         abs_graph->SetPoint(i, wl, T_abs);
@@ -324,6 +347,8 @@ void LArTrans_new::Plot()
     ll->AddEntry(ray_graph, "rayleigh");
     ll->Draw("SAME");
 
+    cg->SetGrid();
+    data_graph->GetYaxis()->SetRangeUser(0, 1.03);
     cg->SaveAs("Trans-new.root");
 }
 

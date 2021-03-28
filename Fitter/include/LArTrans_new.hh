@@ -76,6 +76,7 @@ class LArTrans_new
         static TF1* fRayLength;
         static TF1* fAbs;
         static TF1* fCorr;
+        static TF1* fFiniteDiv;
 
     private:
         static int depolarization;
@@ -121,5 +122,6 @@ extern double gRayLength_new(double* x, double* p);
 extern double gRayLength_delta_new(double* x, double* p);
 extern double gAbs_new(double* x, double* p);
 extern double gCorr_new(double* x, double* p);
+extern double gFiniteDiv(double* x, double *p);
 
 #endif

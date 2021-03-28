@@ -97,7 +97,7 @@ int LArMathMinimizer_new::Minimization(int num, int* ivar, double *init)
     minimum->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
     minimum->SetMaxIterations(10000);  // for GSL
     minimum->SetTolerance(0.001);
-    minimum->SetPrintLevel(0);
+    minimum->SetPrintLevel(1);
 
     // function wrapper for Minimizer_new
     ROOT::Math::Functor f(&GetChi2, 17);
@@ -158,7 +158,7 @@ int LArMathMinimizer_new::Minimization(int num, int* ivar, double *init)
         minimum->FixVariable(6);
         minimum->FixVariable(7);
     } else {
-        minimum->FixVariable(9);
+        //minimum->FixVariable(9);
     }
     
     if (!m_delta)  { 
