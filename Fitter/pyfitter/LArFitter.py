@@ -60,6 +60,7 @@ class MyLeastSquares:
         chi2 += LArRindex.GetChi2()
         chi2 += LArGroupVelocity.GetChi2()
         chi2 += LArTrans.GetChi2()
+        print(LArRindex.GetChi2(), LArGroupVelocity.GetChi2(), LArTrans.GetChi2(), chi2)
         return chi2
 
 
@@ -174,21 +175,23 @@ class LArFitter(object):
     def fit_generic():
         lsq = MyLeastSquares()
         lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T', 'rho0', 'rho1', 'delta', 'k0', 'k1', 'A1', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2'])
-        # this fails
-        try:
-            m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, A1=0.4, mu1=0.126, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T=86, rho0=-1.6e-4, rho1=0.0487, k0=6.07e-11, k1=-3.17e-9)
-            m.errordef=Minuit.LEAST_SQUARES
+        m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, A1=0.4, mu1=0.126, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T=86, rho0=-1.6e-4, rho1=0.0487, k0=6.07e-11, k1=-3.17e-9)
+        m.errordef=Minuit.LEAST_SQUARES
 
-            print("===== Fitting Results =====")
-            print(m.fmin)
-            print(m.values)
-            print(m.errors)
-            print(m.covariance)
+        m.hesse()
 
-            LArRindex.Plot()
-            LArTrans.Plot()
+        print("===== Fitting Results =====")
+        print(m.fmin)
+        print(m.values)
+        print(m.errors)
+        print(m.covariance)
+        print("")
+        print("===========================================")
+        print("Refractive index of LAr at 128nm : %.3f" %LArRindex.rindex_func(0.128))
+        print("Rayleigh scattering lenght of LAr at 128nm : %.3f cm" %LArTrans.lray_func(0.128))
+
+
+        LArRindex.Plot()
+        LArTrans.Plot()
         
-        except:
-            import traceback
-            traceback.print_exc()
 

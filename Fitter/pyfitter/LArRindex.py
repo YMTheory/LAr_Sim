@@ -24,6 +24,8 @@ class LArRindex(object):
 
     @staticmethod
     def LoadData():
+        LArRindex.rindex_data = []
+        LArRindex.rindex_err  = []
         for i in range(len(LArRindex.wavelength)):
             LArRindex.rindex_data.append((LArRindex.rindex0[i]+LArRindex.rindex1[i]+LArRindex.rindex2[i]) / 3.)
             d1 = abs(LArRindex.rindex0[i]-LArRindex.rindex_data[i])
@@ -60,6 +62,8 @@ class LArRindex(object):
     
     @staticmethod
     def GetChi2():
+        LArRindex.chi2 = 0
+        LArRindex.Calculate()
         for i in range(len(LArRindex.rindex_data)):
             LArRindex.chi2 += (LArRindex.rindex_data[i]-LArRindex.rindex_calc[i])**2/LArRindex.rindex_err[i]**2
     

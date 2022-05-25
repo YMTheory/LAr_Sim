@@ -24,6 +24,9 @@ class LArTrans(object):
 
     @staticmethod
     def LoadData():
+        LArTrans.wavelength = []
+        LArTrans.trans_data = []
+        LArTrans.trans_err  = []
         XeDopedFile = "../data/G140ppb.txt"
         with open(XeDopedFile) as f:
             for lines in f.readlines():
@@ -127,6 +130,7 @@ class LArTrans(object):
 
     @staticmethod
     def GetChi2():
+        LArTrans.chi2 = 0
         LArTrans.Calculate()
         for i in range(len(LArTrans.wavelength)):
             LArTrans.chi2 += (LArTrans.trans_data[i] - LArTrans.trans_calc[i])**2 / (LArTrans.trans_err[i])**2

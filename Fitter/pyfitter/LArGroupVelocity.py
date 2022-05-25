@@ -30,6 +30,8 @@ class LArGroupVelocity(object):
 
     @staticmethod
     def GetChi2():
+        LArGroupVelocity.chi2 = 0
+        LArGroupVelocity.Calculate()
         LArGroupVelocity.chi2 += (LArGroupVelocity.v_data - LArGroupVelocity.v_calc)**2 / LArGroupVelocity.v_data_err**2
         return LArGroupVelocity.chi2
 
