@@ -36,15 +36,7 @@ class LArRindex(object):
 
 
     @staticmethod
-    def rindex_func(l, lUV, lIR, a0, aUV, aIR, T, p0, p1):
-        rho = (p0*T+p1) / LArRindex.rho90K
-        A = (a0 + aUV*l**2/(l**2-lUV**2) + aIR*l**2/(l**2-lIR**2)) * rho
-        n = np.sqrt(1+3*A/(3-A))
-        return n 
-
-
-    @staticmethod
-    def Calculate():
+    def rindex_func(l):
         lUV = LArRindex.lUV
         lIR = LArRindex.lIR
         a0 = LArRindex.a0
@@ -53,9 +45,17 @@ class LArRindex(object):
         T = LArRindex.T
         p0 = LArRindex.rho0
         p1 = LArRindex.rho1
+        rho = (p0*T+p1) / LArRindex.rho90K
+        A = (a0 + aUV*l**2/(l**2-lUV**2) + aIR*l**2/(l**2-lIR**2)) * rho
+        n = np.sqrt(1+3*A/(3-A))
+        return n 
 
+
+    @staticmethod
+    def Calculate():
+        LArRindex.rindex_calc = []
         for i in LArRindex.wavelength:
-            LArRindex.rindex_calc.append(LArRindex.rindex_func(i, lUV, lIR, a0, aUV, aIR, T, p0, p1))
+            LArRindex.rindex_calc.append(LArRindex.rindex_func(i))
         
     
     @staticmethod
@@ -65,6 +65,26 @@ class LArRindex(object):
     
         return LArRindex.chi2
 
+
+    @staticmethod
+    def Plot():
+        import matplotlib.pyplot as plt
+        LArRindex.Calculate()
+        fig, ax = plt.subplots()
+        ax.errorbar(LArRindex.wavelength, LArRindex.rindex_data, yerr=LArRindex.rindex_err, fmt="o", label="Simulation")
+        ax.plot(LArRindex.wavelength, LArRindex.rindex_calc, "o", label="Calculation")
+        dx = np.arange(0.120, 0.7, 0.001)
+        dy = LArRindex.rindex_func(dx)
+        ax.plot(dx, dy, "-", lw=1.5, color="gray")
+        ax.plot(0.128, LArRindex.rindex_func(0.128), "*", ms=8, color="red")
+        ax.text(0.131, LArRindex.rindex_func(0.128), "n(128nm)=%.3f"%LArRindex.rindex_func(0.128), fontsize=14)
+        ax.legend(prop={"size":14})
+        ax.set_xlabel("wavelength [um]", fontsize=14)
+        ax.set_ylabel("refractive index", fontsize=14)
+        ax.grid(True)
+        plt.tight_layout()
+        plt.savefig("rindex.pdf")
+                
 
     ######## Getter Functions ######
     @staticmethod
@@ -98,6 +118,18 @@ class LArRindex(object):
     @staticmethod
     def getT():
         return LArRindex.T
+
+    @staticmethod
+    def getDataX():
+        return LArRindex.wavelength
+
+    @staticmethod
+    def getDataY():
+        return LArRindex.rindex_data
+
+    @staticmethod
+    def getDataYerr():
+        return LArRindex.rindex_err
 
     ##########  Setter Functions ##########
     @staticmethod
