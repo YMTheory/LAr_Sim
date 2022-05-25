@@ -1,5 +1,7 @@
 from iminuit import cost, Minuit
 from iminuit.cost import LeastSquares
+from iminuit.util import describe, make_func_code
+
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np
@@ -8,6 +10,61 @@ import numba as nb
 from LArRindex import LArRindex
 from LArTrans import LArTrans
 from LArGroupVelocity import LArGroupVelocity
+
+class MyLeastSquares:
+    """
+    Generic least squares functions with pull terms
+    """
+    errordef = Minuit.LEAST_SQUARES # for Minuit to compute errors correctly
+
+    def __init__(self):
+        LArRindex.LoadData()
+        LArTrans.LoadData()
+
+    def __call__(self, *par):
+        a0 = par[0]
+        aUV = par[1]
+        aIR = par[2]
+        T = par[3]
+        rho0 = par[4]
+        rho1 = par[5]
+        delta = par[6]
+        k0 = par[7]
+        k1 = par[8]
+        A1 = par[9]
+        mu1 = par[10]
+        sigma1 = par[11]
+        A2 = par[12]
+        mu2 = par[13]
+        sigma2 = par[14]
+
+        LArRindex.seta0(a0)
+        LArRindex.setaUV(aUV)
+        LArRindex.setaIR(aIR)
+        LArRindex.setT(T)
+        LArRindex.setrho0(rho0)
+        LArRindex.setrho1(rho1)
+
+        LArTrans.setdelta(delta)
+        LArTrans.setT(T)
+        LArTrans.setk0(k0)
+        LArTrans.setk1(k1)
+        LArTrans.setA1(A1)
+        LArTrans.setmu1(mu1)
+        LArTrans.setsigma1(sigma1)
+        LArTrans.setA2(A2)
+        LArTrans.setmu2(mu2)
+        LArTrans.setsigma2(sigma2)
+
+        chi2 = 0
+        chi2 += LArRindex.GetChi2()
+        chi2 += LArGroupVelocity.GetChi2()
+        chi2 += LArTrans.GetChi2()
+        return chi2
+
+
+
+
 
 class LArFitter(object):
 
@@ -110,4 +167,28 @@ class LArFitter(object):
         print("===========================================")
         print("Refractive index of LAr at 128nm : %.3f" %LArRindex.rindex_func(0.128))
         print("Rayleigh scattering lenght of LAr at 128nm : %.3f cm" %LArTrans.lray_func(0.128))
+
+
+
+    @staticmethod
+    def fit_generic():
+        lsq = MyLeastSquares()
+        lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T', 'rho0', 'rho1', 'delta', 'k0', 'k1', 'A1', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2'])
+        # this fails
+        try:
+            m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, A1=0.4, mu1=0.126, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T=86, rho0=-1.6e-4, rho1=0.0487, k0=6.07e-11, k1=-3.17e-9)
+            m.errordef=Minuit.LEAST_SQUARES
+
+            print("===== Fitting Results =====")
+            print(m.fmin)
+            print(m.values)
+            print(m.errors)
+            print(m.covariance)
+
+            LArRindex.Plot()
+            LArTrans.Plot()
+        
+        except:
+            import traceback
+            traceback.print_exc()
 

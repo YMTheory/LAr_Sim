@@ -60,7 +60,7 @@ if __name__ == "__main__" :
     
     
     LArFitter.initialize()
-    LArFitter.fit()
-    
+    #LArFitter.fit()
+    LArFitter.fit_generic()
 
 
