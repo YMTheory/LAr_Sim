@@ -5,7 +5,7 @@ from LArRindex import LArRindex
 class LArGroupVelocity(object):
 
     v_data = 7.46
-    v_data_err = 0.273
+    v_data_err = 0.03
 
     v_calc = 0
 
