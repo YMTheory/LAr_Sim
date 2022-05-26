@@ -209,6 +209,7 @@ class LArFitter(object):
         print("")
         print("===========================================")
         print("")
+        LArRindex.setT(LArGroupVelocity.getT())
         print("Refractive index of LAr at 128nm : %.3f" %LArRindex.rindex_func(0.128))
         print("Group velocity of LAr at 128nm : %.3f with measured value %.3f" %(LArGroupVelocity.Calculate(), LArGroupVelocity.getDataY()) )
         print("Rayleigh scattering lenght of LAr at 128nm : %.3f cm" %LArTrans.lray_func(0.128))
@@ -216,6 +217,7 @@ class LArFitter(object):
         print("Fitting group velocity temperature: %.2f K"%LArGroupVelocity.getT())
         print("Fitting transmission temperature: %.2f K"%LArTrans.getT())
         print("Parameters in refractive index formula: a0=%.3f, aUV=%.3f, aIR=%.3f"%(LArRindex.geta0(), LArRindex.getaUV(), LArRindex.getaIR()))
+        print("Final chi2 = %.2f (Refractive index) + %.2f (group velocity) + %.2f (transmission)"%(LArRindex.GetChi2_new(), LArGroupVelocity.GetChi2(), LArTrans.GetChi2()))
         print("")
         print("===========================================")
 
