@@ -37,6 +37,7 @@ class MyLeastSquares:
         A2 = par[12]
         mu2 = par[13]
         sigma2 = par[14]
+        nu_f = par[15]
 
         LArRindex.seta0(a0)
         LArRindex.setaUV(aUV)
@@ -55,11 +56,17 @@ class MyLeastSquares:
         LArTrans.setA2(A2)
         LArTrans.setmu2(mu2)
         LArTrans.setsigma2(sigma2)
+        LArTrans.setnuf(nu_f)
 
         chi2 = 0
         chi2 += LArRindex.GetChi2()
         chi2 += LArGroupVelocity.GetChi2()
         chi2 += LArTrans.GetChi2()
+
+        # pull terms
+        chi2 += LArRindex.GetPulls()
+        chi2 += LArTrans.GetPulls()
+
         print(LArRindex.GetChi2(), LArGroupVelocity.GetChi2(), LArTrans.GetChi2(), chi2)
         return chi2
 
@@ -174,10 +181,11 @@ class LArFitter(object):
     @staticmethod
     def fit_generic():
         lsq = MyLeastSquares()
-        lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T', 'rho0', 'rho1', 'delta', 'k0', 'k1', 'A1', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2'])
-        m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, A1=0.4, mu1=0.126, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T=86, rho0=-1.6e-4, rho1=0.0487, k0=6.07e-11, k1=-3.17e-9)
+        lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T', 'rho0', 'rho1', 'delta', 'k0', 'k1', 'A1', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2', 'nuf'])
+        m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, A1=0.4, mu1=0.127, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T=86, rho0=-1.6e-4, rho1=0.0487, k0=6.07e-11, k1=-3.17e-9, nuf=0)
         m.errordef=Minuit.LEAST_SQUARES
 
+        m.migrad()
         m.hesse()
 
         print("===== Fitting Results =====")
@@ -187,8 +195,15 @@ class LArFitter(object):
         print(m.covariance)
         print("")
         print("===========================================")
+        print("")
         print("Refractive index of LAr at 128nm : %.3f" %LArRindex.rindex_func(0.128))
+        print("Group velocity of LAr at 128nm : %.3f with measured value %.3f" %(LArGroupVelocity.Calculate(), LArGroupVelocity.getDataY()) )
         print("Rayleigh scattering lenght of LAr at 128nm : %.3f cm" %LArTrans.lray_func(0.128))
+        print("Fitting depolarization ratio value: %.3f" %LArTrans.getdelta())
+        print("Fitting temperature: %.2f K"%LArTrans.getT())
+        print("Parameters in refractive index formula: a0=%.3f, aUV=%.3f, aIR=%.3f"%(LArRindex.geta0(), LArRindex.getaUV(), LArRindex.getaIR()))
+        print("")
+        print("===========================================")
 
 
         LArRindex.Plot()

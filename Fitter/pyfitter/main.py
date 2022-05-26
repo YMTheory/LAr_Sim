@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from LArRindex import LArRindex
 from LArGroupVelocity import LArGroupVelocity
@@ -54,10 +55,21 @@ def pretest():
     print(LArTrans.GetChi2())
 
 
+def check_fresnel():
+    dx = np.arange(125, 150, 1)
+    dy = LArTrans.fresnel_func(dx/1000.)
+
+    fig, ax = plt.subplots()
+    ax.plot(dx, dy, "-", color="coral", lw=2)
+    ax.set_xlabel("wavelength [nm]", fontsize=14)
+    ax.set_ylabel("Fresnel correction", fontsize=14)
+    plt.tight_layout()
+    plt.show()
+
 if __name__ == "__main__" :
    
     #pretest()
-    
+    #check_fresnel()
     
     LArFitter.initialize()
     #LArFitter.fit()

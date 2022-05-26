@@ -17,6 +17,17 @@ class LArRindex(object):
     rho1 = 0.0487
     T = 86
 
+    a00 = 0.335
+    aUV0 = 0.099
+    aIR0 = 0.008
+    e_a0 = 0.003
+    e_aUV = 0.003
+    e_aIR = 0.003
+    rho00 = -0.000158
+    rho10 = 0.0487
+    e_rho0 = 0.000004
+    e_rho1 = 0.0003
+
     rindex_data = []
     rindex_err  = []
     rindex_calc = []
@@ -71,12 +82,24 @@ class LArRindex(object):
 
 
     @staticmethod
+    def GetPulls():
+        pull = 0
+        pull += (LArRindex.a0 - LArRindex.a00)**2 / LArRindex.e_a0**2
+        pull += (LArRindex.aUV - LArRindex.aUV0)**2 / LArRindex.e_aUV**2
+        pull += (LArRindex.aIR - LArRindex.aIR0)**2 / LArRindex.e_aIR**2
+        pull += (LArRindex.rho0 - LArRindex.rho00)**2 / LArRindex.e_rho0**2
+        pull += (LArRindex.rho1 - LArRindex.rho10)**2 / LArRindex.e_rho1**2
+        return pull
+
+
+    @staticmethod
     def Plot():
+        print("-------------------> Saving fitted refractive index values ! +++++++++++++ ")
         import matplotlib.pyplot as plt
         LArRindex.Calculate()
         fig, ax = plt.subplots()
         ax.errorbar(LArRindex.wavelength, LArRindex.rindex_data, yerr=LArRindex.rindex_err, fmt="o", label="Simulation")
-        ax.plot(LArRindex.wavelength, LArRindex.rindex_calc, "o", label="Calculation")
+        ax.plot(LArRindex.wavelength, LArRindex.rindex_calc, "o", fillstyle="none", label="Calculation")
         dx = np.arange(0.120, 0.7, 0.001)
         dy = LArRindex.rindex_func(dx)
         ax.plot(dx, dy, "-", lw=1.5, color="gray")

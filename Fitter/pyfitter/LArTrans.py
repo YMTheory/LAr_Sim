@@ -20,6 +20,15 @@ class LArTrans(object):
     mu2 = 140.12
     sigma2 = 1.537
 
+    nu_f = 0.0
+    e_f = 1
+    k00 = 6.0712e-11
+    k10 = -3.1699e-09
+    e_k0 = np.sqrt(1.49189964e-24)
+    e_k1 = np.sqrt(1.11432969e-20)
+    T0 = 86
+    e_T = 3./np.sqrt(12.)
+
     chi2 = 0
 
     @staticmethod
@@ -93,11 +102,12 @@ class LArTrans(object):
     def fresnel_func(l):
         wl = l * 1000
         E = 1240./wl
-        a = 38
-        E0 = 12.8234
-        gamma = 0.42357
-        b = 247.188
-        E1 = 18.8448
+        # MgF2, -193 degree
+        a = 29
+        E0 = 12.0226
+        gamma = 0.3594
+        b = 295.855
+        E1 = 20.8448
         
         n_MgF2 = np.sqrt(1+a*(E0*E0-E*E)/((E0*E0-E*E)*(E0*E0-E*E)+gamma*E*E) + b/(E1*E1-E*E))
 
@@ -125,7 +135,7 @@ class LArTrans(object):
         LArTrans.trans_calc = []
         for i in LArTrans.wavelength:
             trans_pred = LArTrans.transmission_func(i)
-            LArTrans.trans_calc.append(trans_pred)
+            LArTrans.trans_calc.append(trans_pred * (1 + LArTrans.nu_f))
 
 
     @staticmethod
@@ -136,13 +146,37 @@ class LArTrans(object):
             LArTrans.chi2 += (LArTrans.trans_data[i] - LArTrans.trans_calc[i])**2 / (LArTrans.trans_err[i])**2
         return LArTrans.chi2
 
+
+    @staticmethod
+    def GetPulls():
+        pull = 0
+        pull += (LArTrans.k0 - LArTrans.k00)**2 / LArTrans.e_k0**2
+        pull += (LArTrans.k1 - LArTrans.k10)**2 / LArTrans.e_k1**2
+        pull += LArTrans.nu_f**2 / LArTrans.e_f**2
+        pull += (LArTrans.T - LArTrans.T0)**2 / LArTrans.e_T**2
+
+        return pull
+
+
+
     @staticmethod
     def Plot():
+        print("-------------------> Saving fitted transmission spectrum ! +++++++++++++ ")
         import matplotlib.pyplot as plt
         LArTrans.Calculate()
         fig, ax = plt.subplots()
-        ax.errorbar(LArTrans.wavelength, LArTrans.trans_data, yerr=LArTrans.trans_err, fmt="o", label="Simulation")
-        ax.plot(LArTrans.wavelength, LArTrans.trans_calc, "o", label="Calculation")
+        draw_data, draw_err = [], []
+        for i in range(len(LArTrans.wavelength)):
+            draw_data.append(LArTrans.trans_data[i] / LArTrans.fresnel_func(LArTrans.wavelength[i]))
+            draw_err.append(LArTrans.trans_err[i] / LArTrans.fresnel_func(LArTrans.wavelength[i]))
+        ax.errorbar(LArTrans.wavelength, draw_data, yerr=draw_err, fmt="o", label="Simulation")
+        dx = np.arange(0.125, 0.150, 0.0001)
+        draw_calc = []
+        for i in range(len(LArTrans.wavelength)):
+            draw_calc.append(LArTrans.Tabs_func(LArTrans.wavelength[i]) * np.exp(-5.8/LArTrans.lray_func(LArTrans.wavelength[i])))
+        ax.plot(LArTrans.wavelength, draw_calc, "^", fillstyle="none", label="Calc: tot")
+        ax.plot(dx, np.exp(-5.8/LArTrans.lray_func(dx)), "-", label="Calc: Ray")
+        ax.plot(dx, LArTrans.Tabs_func(dx), "-", label="Calc: Abs")
         ax.legend(prop={"size":14})
         ax.set_xlabel("wavelength [um]", fontsize=14)
         ax.set_ylabel("transmission", fontsize=14)
@@ -207,6 +241,10 @@ class LArTrans(object):
     def getDataYerr():
         return LArTrans.trans_err
 
+    @staticmethod
+    def getnuf():
+        return LArTrans.nu_f
+
 
     ######### Setter Functions ##########
     @staticmethod
@@ -249,6 +287,9 @@ class LArTrans(object):
     def setsigma2(val):
         LArTrans.sigma2 = val
 
+    @staticmethod
+    def setnuf(val):
+        LArTrans.nu_f = val
 
 
 
