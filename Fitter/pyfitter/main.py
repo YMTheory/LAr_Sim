@@ -18,7 +18,8 @@ def pretest():
     A2=0.4 
     mu2=0.14012 
     sigma2=0.00154 
-    T=86 
+    T_v = 89
+    T_t=86 
     rho0=-1.6e-4 
     rho1=0.0487 
     k0=6.07e-11 
@@ -28,17 +29,18 @@ def pretest():
     LArRindex.seta0(a0)
     LArRindex.setaUV(aUV)
     LArRindex.setaIR(aIR)
-    LArRindex.setT(T)
-    LArRindex.setrho0(rho0)
-    LArRindex.setrho1(rho1)
-    LArRindex.Calculate()
+    #LArRindex.setT(T)
+    LArRindex.setrhop0(rho0)
+    LArRindex.setrhop1(rho1)
+    LArRindex.Calculate_new()
     LArRindex.Plot()
-    print(LArRindex.GetChi2())
+    print(LArRindex.GetChi2_new())
 
-    print(LArGroupVelocity.getDataY(), LArGroupVelocity.Calculate())
+    LArGroupVelocity.setT(T_v)
+    print(LArGroupVelocity.getDataY(), LArGroupVelocity.Calculate(), LArGroupVelocity.GetChi2())
 
     LArTrans.setdelta(delta)
-    LArTrans.setT(T)
+    LArTrans.setT(T_t)
     LArTrans.setk0(k0)
     LArTrans.setk1(k1)
     LArTrans.setA1(A1)
@@ -55,21 +57,9 @@ def pretest():
     print(LArTrans.GetChi2())
 
 
-def check_fresnel():
-    dx = np.arange(125, 150, 1)
-    dy = LArTrans.fresnel_func(dx/1000.)
-
-    fig, ax = plt.subplots()
-    ax.plot(dx, dy, "-", color="coral", lw=2)
-    ax.set_xlabel("wavelength [nm]", fontsize=14)
-    ax.set_ylabel("Fresnel correction", fontsize=14)
-    plt.tight_layout()
-    plt.show()
-
 if __name__ == "__main__" :
    
     #pretest()
-    #check_fresnel()
     
     LArFitter.initialize()
     #LArFitter.fit()

@@ -50,6 +50,7 @@ class LArTrans(object):
 
     @staticmethod
     def lray_func_iso(l):
+        LArRindex.setT(LArTrans.T)
         rindex = LArRindex.rindex_func(l)
         delta = 0
         T = LArTrans.T
@@ -69,6 +70,7 @@ class LArTrans(object):
         
     @staticmethod
     def lray_func(l):
+        LArRindex.setT(LArTrans.T)
         rindex = LArRindex.rindex_func(l)
         delta = LArTrans.delta
         T = LArTrans.T
@@ -112,6 +114,7 @@ class LArTrans(object):
         n_MgF2 = np.sqrt(1+a*(E0*E0-E*E)/((E0*E0-E*E)*(E0*E0-E*E)+gamma*E*E) + b/(E1*E1-E*E))
 
         n_vac = 1.
+        LArRindex.setT(LArTrans.T)
         n_LAr = LArRindex.rindex_func(l)
 
         f_F = 1 / (1-((n_vac - n_MgF2)/(n_vac + n_MgF2))**2/1-((n_MgF2 - n_LAr)/(n_MgF2+n_LAr))**2)**2
@@ -132,6 +135,7 @@ class LArTrans(object):
 
     @staticmethod
     def Calculate():
+        LArRindex.setT(LArTrans.T)
         LArTrans.trans_calc = []
         for i in LArTrans.wavelength:
             trans_pred = LArTrans.transmission_func(i)
