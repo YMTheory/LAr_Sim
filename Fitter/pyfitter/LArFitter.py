@@ -191,6 +191,13 @@ class LArFitter(object):
         plt.savefig("profile1d_%s.pdf"%par)
 
     @staticmethod
+    def draw_cov(mat):
+        fig, ax = plt.subplots()
+        ax.matshow(mat)
+        plt.savefig("covariance_matrix.pdf")
+
+
+    @staticmethod
     def fit_generic():
         lsq = MyLeastSquares()
         lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T_v', 'T_t', 'rhop0', 'rhop1', 'delta', 'k0', 'k1', 'A1', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2', 'nuf'])
@@ -227,8 +234,10 @@ class LArFitter(object):
         
 
         ### Draw 1D profile:
-        par = "delta"
-        #mnp = m.draw_mnprofile("delta", size=60)
-        mnp = m.mnprofile("delta", bound=(0, 0.5), subtract_min=True)
-        LArFitter.draw_profile1d(mnp[0], mnp[1], par)
+        #par = "delta"
+        #mnp = m.mnprofile("delta", bound=(0, 0.5), subtract_min=True)
+        #LArFitter.draw_profile1d(mnp[0], mnp[1], par)
     
+        cov = m.covariance
+        LArFitter.draw_cov(cov)
+
