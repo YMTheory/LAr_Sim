@@ -67,7 +67,7 @@ class MyLeastSquares:
         chi2 += LArRindex.GetPulls()
         chi2 += LArTrans.GetPulls()
 
-        print(LArRindex.GetChi2(), LArGroupVelocity.GetChi2(), LArTrans.GetChi2(), chi2)
+        #print(LArRindex.GetChi2(), LArGroupVelocity.GetChi2(), LArTrans.GetChi2(), chi2)
         return chi2
 
 
@@ -177,6 +177,14 @@ class LArFitter(object):
         print("Rayleigh scattering lenght of LAr at 128nm : %.3f cm" %LArTrans.lray_func(0.128))
 
 
+    @staticmethod
+    def draw_profile1d(x, y, par):
+        fig ,ax = plt.subplots()
+        ax.plot(x, y, "-", lw=2, color="coral")
+        ax.set_xlabel(par, fontsize=14)
+        ax.set_ylabel(r"$\Delta\chi^2$", fontsize=14)
+        plt.tight_layout()
+        plt.savefig("profile1d_%s.pdf"%par)
 
     @staticmethod
     def fit_generic():
@@ -187,6 +195,7 @@ class LArFitter(object):
 
         m.migrad()
         m.hesse()
+
 
         print("===== Fitting Results =====")
         print(m.fmin)
@@ -210,3 +219,9 @@ class LArFitter(object):
         LArTrans.Plot()
         
 
+        ### Draw 1D profile:
+        par = "delta"
+        #mnp = m.draw_mnprofile("delta", size=60)
+        mnp = m.mnprofile("delta", bound=(0, 0.5), subtract_min=True)
+        LArFitter.draw_profile1d(mnp[0], mnp[1], par)
+    
