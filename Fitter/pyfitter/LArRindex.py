@@ -42,11 +42,14 @@ class LArRindex(object):
     rho3 = 0.03481    # 88 K
     rho4 = 0.03449    # 90 K
     
-
     chi2 = 0
+
+    seed  = 0
+    toyMC = False
 
     @staticmethod
     def LoadData():
+        np.random.seed(LArRindex.seed)
         LArRindex.rindex_data = []
         LArRindex.rindex_err  = []
         for i in range(len(LArRindex.wavelength)):
@@ -67,16 +70,25 @@ class LArRindex(object):
         LArRindex.rindex_data_T4 = []
         LArRindex.rindex_err_T4  = []
         for i in range(len(LArRindex.wavelength)):
-            LArRindex.rindex_data_T1.append(LArRindex.rindex1[i])
-            LArRindex.rindex_err_T1.append(LArRindex.rindex1[i]*0.001)
-            LArRindex.rindex_data_T2.append(LArRindex.rindex2[i])
-            LArRindex.rindex_err_T2.append(LArRindex.rindex2[i]*0.001)
-            LArRindex.rindex_data_T3.append(LArRindex.rindex3[i])
-            LArRindex.rindex_err_T3.append(LArRindex.rindex3[i]*0.001)
-            LArRindex.rindex_data_T4.append(LArRindex.rindex4[i])
-            LArRindex.rindex_err_T4.append(LArRindex.rindex4[i]*0.001)
+            if not LArRindex.toyMC:
+                LArRindex.rindex_data_T1.append(LArRindex.rindex1[i])
+                LArRindex.rindex_err_T1.append(LArRindex.rindex1[i]*0.001)
+                LArRindex.rindex_data_T2.append(LArRindex.rindex2[i])
+                LArRindex.rindex_err_T2.append(LArRindex.rindex2[i]*0.001)
+                LArRindex.rindex_data_T3.append(LArRindex.rindex3[i])
+                LArRindex.rindex_err_T3.append(LArRindex.rindex3[i]*0.001)
+                LArRindex.rindex_data_T4.append(LArRindex.rindex4[i])
+                LArRindex.rindex_err_T4.append(LArRindex.rindex4[i]*0.001)
+            else:
+                LArRindex.rindex_data_T1.append(np.random.normal(LArRindex.rindex1[i], 0.001*LArRindex.rindex1[i]))
+                LArRindex.rindex_err_T1.append(LArRindex.rindex1[i]*0.001)
+                LArRindex.rindex_data_T2.append(np.random.normal(LArRindex.rindex2[i], 0.001*LArRindex.rindex2[i]))
+                LArRindex.rindex_err_T2.append(LArRindex.rindex2[i]*0.001)
+                LArRindex.rindex_data_T3.append(np.random.normal(LArRindex.rindex3[i], 0.001*LArRindex.rindex3[i]))
+                LArRindex.rindex_err_T3.append(LArRindex.rindex3[i]*0.001)
+                LArRindex.rindex_data_T4.append(np.random.normal(LArRindex.rindex4[i], 0.001*LArRindex.rindex4[i]))
+                LArRindex.rindex_err_T4.append(LArRindex.rindex4[i]*0.001)
     
-
 
     @staticmethod
     def rindex_func(l):
@@ -266,6 +278,14 @@ class LArRindex(object):
     def getrho90K():
         return LArRindex.rho90K
 
+    @staticmethod
+    def getseed():
+        return LArRindex.seed
+
+    @staticmethod
+    def getToyMC():
+        return LArRindex.toyMC
+
     ##########  Setter Functions ##########
     @staticmethod
     def setlUV(val):
@@ -298,6 +318,15 @@ class LArRindex(object):
     @staticmethod
     def setT(val):
         LArRindex.T = val
+
+    @staticmethod
+    def setseed(val):
+        LArRindex.seed = val
+
+    @staticmethod
+    def setToyMC(flag):
+        LArRindex.toyMC = flag
+
 
 
 

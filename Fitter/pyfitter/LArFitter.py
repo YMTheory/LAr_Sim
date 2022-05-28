@@ -18,10 +18,18 @@ class MyLeastSquares:
     errordef = Minuit.LEAST_SQUARES # for Minuit to compute errors correctly
     lr = 0
     lL = 0
+    seed = 0
+    toyMC = False
 
-    def __init__(self, m_lr, m_lL):
+    def __init__(self, m_lr, m_lL, flag, seed):
         self.lr = m_lr
         self.lL = m_lL
+        self.seed = seed
+        self.toyMC = flag
+        LArRindex.setToyMC(self.toyMC)
+        LArRindex.setseed(self.seed)
+        LArTrans.setToyMC(self.toyMC)
+        LArTrans.setseed(self.seed)
         LArRindex.LoadData()
         LArTrans.LoadData()
 
@@ -89,6 +97,9 @@ class LArFitter(object):
     verboseLevel = 0
     chi2min = 0
 
+    seed = 0
+    toyMC = False
+
     @staticmethod
     def setlr(val):
         LArFitter.lr = val
@@ -105,9 +116,21 @@ class LArFitter(object):
     def getchi2min():
         return LArFitter.chi2min
 
+    @staticmethod
+    def setseed(val):
+        LArFitter.seed = val
+
+    @staticmethod
+    def setToyMC(flag):
+        LArFitter.toyMC = flag
+    
 
     @staticmethod
     def initialize():
+        if LArFitter.toyMC:
+            print("\n")
+            print(" >>>>>>>>>>>>>>>>>>>>>>>>>> Running fitting on toyMC datasets! <<<<<<<<<<<<<<<<<<<<<<< ")
+            print("\n")
         LArRindex.LoadData()
         LArTrans.LoadData()
 
@@ -240,7 +263,7 @@ class LArFitter(object):
 
     @staticmethod
     def fit_generic():
-        lsq = MyLeastSquares(LArFitter.lr, LArFitter.lL)
+        lsq = MyLeastSquares(LArFitter.lr, LArFitter.lL, LArFitter.toyMC, LArFitter.seed)
         lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T_v', 'T_t', 'rhop0', 'rhop1', 'delta', 'k0', 'k1', 'R', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2', 'nuf'])
         m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, R=0.937, mu1=0.127, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T_v=89, T_t=87, rhop0=-1.6e-4, rhop1=0.0487, k0=6.07e-11, k1=-3.17e-9, nuf=0)
         m.errordef=Minuit.LEAST_SQUARES
@@ -270,16 +293,17 @@ class LArFitter(object):
             print("")
             print("===========================================")
 
-
-            LArRindex.Plot()
-            LArTrans.Plot()
+            ## ====================== output plots
+            #LArRindex.Plot()
+            #LArTrans.Plot()
         
+            ## ====================== profiled plots:
             ### Draw 1D profile:
-            par = "R"
-            mnp = m.mnprofile(par, bound=(0.87, 1.0), size=50, subtract_min=True)
-            ##LArFitter.draw_profile1d(mnp[0], mnp[1], par)
-            print(mnp[0])
-            print(mnp[1])
+            #par = "R"
+            #mnp = m.mnprofile(par, bound=(0.87, 1.0), size=50, subtract_min=True)
+            ###LArFitter.draw_profile1d(mnp[0], mnp[1], par)
+            #print(mnp[0])
+            #print(mnp[1])
 
             
             ###  Draw 2D profile :
@@ -289,6 +313,7 @@ class LArFitter(object):
             #print(mnp)
 
 
+            ## ====================== correlation_matrix plots:
             #cov = m.covariance
             #LArFitter.draw_corr(cov, m.errors)
 

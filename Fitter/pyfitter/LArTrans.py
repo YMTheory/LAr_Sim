@@ -32,8 +32,12 @@ class LArTrans(object):
 
     chi2 = 0
 
+    seed = 0
+    toyMC = False
+
     @staticmethod
     def LoadData():
+        np.random.seed(LArTrans.seed)
         LArTrans.wavelength = []
         LArTrans.trans_data = []
         LArTrans.trans_err  = []
@@ -43,9 +47,14 @@ class LArTrans(object):
                 line = lines.strip("\n")
                 data = line.split(" ")
                 if float(data[0]) > 125:
-                    LArTrans.wavelength.append(float(data[0])/1000.)
-                    LArTrans.trans_data.append(float(data[1]))
-                    LArTrans.trans_err.append(float(data[2]))
+                    if not LArTrans.toyMC:
+                        LArTrans.wavelength.append(float(data[0])/1000.)
+                        LArTrans.trans_data.append(float(data[1]))
+                        LArTrans.trans_err.append(float(data[2]))
+                    else:
+                        LArTrans.wavelength.append(float(data[0])/1000.)
+                        LArTrans.trans_data.append(np.random.normal(float(data[1]), float(data[2])))
+                        LArTrans.trans_err.append(float(data[2]))
 
 
 
@@ -256,6 +265,14 @@ class LArTrans(object):
     def getR():
         return LArTrans.R
 
+    @staticmethod
+    def getseed():
+        return LArTrans.seed
+
+    @staticmethod
+    def getToyMC():
+        return LArTrans.toyMC
+
 
     ######### Setter Functions ##########
     @staticmethod
@@ -307,7 +324,13 @@ class LArTrans(object):
     def setR(val):
         LArTrans.R = val
 
+    @staticmethod
+    def setseed(val):
+        LArTrans.seed = val
 
+    @staticmethod
+    def setToyMC(flag):
+        LArTrans.toyMC = flag
 
 
 

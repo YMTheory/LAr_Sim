@@ -60,24 +60,34 @@ def pretest():
 if __name__ == "__main__" :
    
     #pretest()
-    
+
+    LArFitter.setverbose(0)
+    LArFitter.setToyMC(True)
     LArFitter.initialize()
-    #LArFitter.setverbose(1)
-    #LArFitter.fit()
-    #LArFitter.fit_generic()
+    delta_arr, R_arr, chi2_arr = [], [], []
+    for i in range(300, 400, 1):
+        print("Running toyMC dataset %d"%i)
+        LArFitter.setseed(i)
+        LArFitter.fit_generic()
+        delta_arr.append(LArTrans.getdelta())
+        R_arr.append(LArTrans.getR())
+        chi2_arr.append(LArFitter.getchi2min())
+
+        LArRindex.setT(LArGroupVelocity.getT())
+        print(LArTrans.getdelta(), LArTrans.getR(), LArRindex.rindex_func(0.128), LArTrans.lray_func(0.128), LArFitter.getchi2min())
 
     ## Lagrange multiplier : refractive index and Rayleigh scattering length
-    rindex, lray, chi2min = [], [], []
-    for i in np.arange(-2000, 2010, 10):
-        print("factor %.2f"%i)
-        LArFitter.setlr(i)
-        LArFitter.fit_generic()
-        
-        LArRindex.setT(LArGroupVelocity.getT())
-        rindex.append(LArRindex.rindex_func(0.128))
-        #LArRindex.setT(LArTrans.getT())
-        #lray.append(LArTrans.lray_func(0.128))
-        chi2min.append(LArFitter.getchi2min())
-        print(rindex[-1], chi2min[-1])
-        #print(lray[-1], chi2min[-1])
+    #rindex, lray, chi2min = [], [], []
+    #for i in np.arange(-2000, 2010, 10):
+    #    print("factor %.2f"%i)
+    #    LArFitter.setlr(i)
+    #    LArFitter.fit_generic()
+    #    
+    #    LArRindex.setT(LArGroupVelocity.getT())
+    #    rindex.append(LArRindex.rindex_func(0.128))
+    #    #LArRindex.setT(LArTrans.getT())
+    #    #lray.append(LArTrans.lray_func(0.128))
+    #    chi2min.append(LArFitter.getchi2min())
+    #    print(rindex[-1], chi2min[-1])
+    #    #print(lray[-1], chi2min[-1])
 
