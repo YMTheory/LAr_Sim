@@ -13,6 +13,7 @@ class LArTrans(object):
     k0 = 6.0712e-11
     k1 = -3.1699e-09
 
+    R = 0.937
     A1  = 0.4
     mu1 = 126.51
     sigma1 = 1
@@ -89,12 +90,14 @@ class LArTrans(object):
 
     @staticmethod
     def Tabs_func(l):
-        A1     = LArTrans.A1
+        #A1     = LArTrans.A1
+        R      = LArTrans.R
         mu1    = LArTrans.mu1
         sigma1 = LArTrans.sigma1
         A2     = LArTrans.A2
         mu2    = LArTrans.mu2
         sigma2 = LArTrans.sigma2
+        A1 = R * A2
 
         A_abs = A1*np.exp(-(l-mu1)*(l-mu1)/2/sigma1/sigma1) + A2*np.exp(-(l-mu2)*(l-mu2)/2/sigma2/sigma2);
         T_abs = np.exp( -A_abs*np.log(10.) );
@@ -249,6 +252,10 @@ class LArTrans(object):
     def getnuf():
         return LArTrans.nu_f
 
+    @staticmethod
+    def getR():
+        return LArTrans.R
+
 
     ######### Setter Functions ##########
     @staticmethod
@@ -296,7 +303,9 @@ class LArTrans(object):
         LArTrans.nu_f = val
 
 
-
+    @staticmethod
+    def setR(val):
+        LArTrans.R = val
 
 
 

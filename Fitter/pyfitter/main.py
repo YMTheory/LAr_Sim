@@ -66,17 +66,18 @@ if __name__ == "__main__" :
     #LArFitter.fit()
     #LArFitter.fit_generic()
 
-    ## Lagrange multiplier :
+    ## Lagrange multiplier : refractive index and Rayleigh scattering length
     rindex, lray, chi2min = [], [], []
-    for i in np.arange(-0.8, -0.6, 0.01):
+    for i in np.arange(-2000, 2010, 10):
         print("factor %.2f"%i)
-        LArFitter.setlL(i)
+        LArFitter.setlr(i)
         LArFitter.fit_generic()
         
         LArRindex.setT(LArGroupVelocity.getT())
-        #rindex.append(LArRindex.rindex_func(0.128))
-        lray.append(LArTrans.lray_func(0.128))
+        rindex.append(LArRindex.rindex_func(0.128))
+        #LArRindex.setT(LArTrans.getT())
+        #lray.append(LArTrans.lray_func(0.128))
         chi2min.append(LArFitter.getchi2min())
-        #print(rindex[-1], chi2min[-1])
-        print(lray[-1], chi2min[-1])
+        print(rindex[-1], chi2min[-1])
+        #print(lray[-1], chi2min[-1])
 

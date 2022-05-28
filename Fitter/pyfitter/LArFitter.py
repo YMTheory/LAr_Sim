@@ -36,7 +36,7 @@ class MyLeastSquares:
         delta   = par[7]
         k0      = par[8]
         k1      = par[9]
-        A1      = par[10]
+        R       = par[10]
         mu1     = par[11]
         sigma1  = par[12]
         A2      = par[13]
@@ -56,7 +56,7 @@ class MyLeastSquares:
         LArTrans.setT(T_t)
         LArTrans.setk0(k0)
         LArTrans.setk1(k1)
-        LArTrans.setA1(A1)
+        LArTrans.setR(R) 
         LArTrans.setmu1(mu1)
         LArTrans.setsigma1(sigma1)
         LArTrans.setA2(A2)
@@ -70,11 +70,11 @@ class MyLeastSquares:
 
         chi2 += LArGroupVelocity.GetChi2()
         chi2 += LArGroupVelocity.GetPulls()
-        #chi2 += self.lr * LArRindex.rindex_func(0.128)    #### Lagrange multiplier
+        chi2 += self.lr * LArRindex.rindex_func(0.128)    #### Lagrange multiplier
 
         chi2 += LArTrans.GetChi2()
         chi2 += LArTrans.GetPulls()
-        chi2 += self.lL * LArTrans.lray_func(0.128)    #### Lagrange multiplier
+        #chi2 += self.lL * LArTrans.lray_func(0.128)    #### Lagrange multiplier
 
 
         #print(LArRindex.GetChi2(), LArGroupVelocity.GetChi2(), LArTrans.GetChi2(), chi2)
@@ -135,7 +135,7 @@ class LArFitter(object):
 
     
     @staticmethod
-    def transmission_pdf(x, a0, aUV, aIR, T, rho0, rho1, delta, k0, k1, A1, mu1, sigma1, A2, mu2, sigma2):
+    def transmission_pdf(x, a0, aUV, aIR, T, rho0, rho1, delta, k0, k1, R, mu1, sigma1, A2, mu2, sigma2):
 
         LArRindex.seta0(a0)
         LArRindex.setaUV(aUV)
@@ -148,7 +148,7 @@ class LArFitter(object):
         LArTrans.setT(T)
         LArTrans.setk0(k0)
         LArTrans.setk1(k1)
-        LArTrans.setA1(A1)
+        LArTrans.setR(R)
         LArTrans.setmu1(mu1)
         LArTrans.setsigma1(sigma1)
         LArTrans.setA2(A2)
@@ -182,7 +182,7 @@ class LArFitter(object):
 
         
         least_squares = least_squares1 + least_squares2 + least_squares3
-        m = Minuit(least_squares, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, A1=0.4, mu1=0.126, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T=86, rho0=-1.6e-4, rho1=0.0487, k0=6.07e-11, k1=-3.17e-9)
+        m = Minuit(least_squares, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, R=0.937, mu1=0.126, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T=86, rho0=-1.6e-4, rho1=0.0487, k0=6.07e-11, k1=-3.17e-9)
         m.limits["a0"] = (0.1, 0.5)
         m.limits["aUV"] = (0.05, 0.15)
         m.limits["aIR"] = (0.001, 0.02)
@@ -226,8 +226,8 @@ class LArFitter(object):
     @staticmethod
     def fit_generic():
         lsq = MyLeastSquares(LArFitter.lr, LArFitter.lL)
-        lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T_v', 'T_t', 'rhop0', 'rhop1', 'delta', 'k0', 'k1', 'A1', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2', 'nuf'])
-        m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, A1=0.4, mu1=0.127, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T_v=89, T_t=87, rhop0=-1.6e-4, rhop1=0.0487, k0=6.07e-11, k1=-3.17e-9, nuf=0)
+        lsq.func_code = make_func_code(['a0', 'aUV', 'aIR', 'T_v', 'T_t', 'rhop0', 'rhop1', 'delta', 'k0', 'k1', 'R', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2', 'nuf'])
+        m = Minuit(lsq, a0=0.3347, aUV=0.0994, aIR=0.008, delta=0.307, R=0.937, mu1=0.127, sigma1=0.001, A2=0.4, mu2=0.140, sigma2=0.00154, T_v=89, T_t=87, rhop0=-1.6e-4, rhop1=0.0487, k0=6.07e-11, k1=-3.17e-9, nuf=0)
         m.errordef=Minuit.LEAST_SQUARES
 
         m.migrad()
@@ -260,9 +260,9 @@ class LArFitter(object):
             LArTrans.Plot()
         
             ### Draw 1D profile:
-            #par = "delta"
-            #mnp = m.mnprofile("delta", bound=(0, 0.5), subtract_min=True)
-            #LArFitter.draw_profile1d(mnp[0], mnp[1], par)
+            par = "delta"
+            mnp = m.mnprofile("delta", bound=(0, 0.5), subtract_min=True)
+            LArFitter.draw_profile1d(mnp[0], mnp[1], par)
     
             cov = m.covariance
             LArFitter.draw_cov(cov)
