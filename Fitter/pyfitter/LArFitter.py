@@ -217,10 +217,25 @@ class LArFitter(object):
         plt.savefig("profile1d_%s.pdf"%par)
 
     @staticmethod
-    def draw_cov(mat):
+    def draw_corr(mat, parerr):
+        import seaborn as sns
+        pars = ['a0', 'aUV', 'aIR', 'T_v', 'T_t', 'rhop0', 'rhop1', 'delta', 'k0', 'k1', 'R', 'mu1', 'sigma1', 'A2', 'mu2', 'sigma2', 'nuf']
+        corr = np.zeros((len(pars), len(pars)))
+        Ndim = len(pars) + 0.5
+        for i in range(len(pars)):
+            for j in range(len(pars)):
+                corr[i, j] = mat[i, j] / parerr[i] / parerr[j]
         fig, ax = plt.subplots()
-        ax.matshow(mat)
-        plt.savefig("covariance_matrix.pdf")
+        im = ax.matshow(corr)
+        #ax = sns.heatmap(corr, annot=True, fmt=".2f")
+        ax.set_xticks(np.arange(0.5, Ndim, 1))
+        ax.set_yticks(np.arange(0.5, Ndim, 1))
+        ax.set_xticklabels(pars, fontsize=12)
+        ax.set_yticklabels(pars, fontsize=12)
+        plt.colorbar(im)
+        plt.xticks(rotation=65)
+        plt.tight_layout()
+        plt.savefig("correlation_matrix.pdf")
 
 
     @staticmethod
@@ -260,12 +275,22 @@ class LArFitter(object):
             LArTrans.Plot()
         
             ### Draw 1D profile:
-            par = "delta"
-            mnp = m.mnprofile("delta", bound=(0, 0.5), subtract_min=True)
-            LArFitter.draw_profile1d(mnp[0], mnp[1], par)
-    
-            cov = m.covariance
-            LArFitter.draw_cov(cov)
+            par = "R"
+            mnp = m.mnprofile(par, bound=(0.87, 1.0), size=50, subtract_min=True)
+            ##LArFitter.draw_profile1d(mnp[0], mnp[1], par)
+            print(mnp[0])
+            print(mnp[1])
+
+            
+            ###  Draw 2D profile :
+            #par1 = "delta"
+            #par2 = "R"
+            #mnp = m.mncontour(par1, par2, cl=0.9973, size=200)
+            #print(mnp)
+
+
+            #cov = m.covariance
+            #LArFitter.draw_corr(cov, m.errors)
 
 
 
